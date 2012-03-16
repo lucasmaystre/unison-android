@@ -19,6 +19,11 @@
       android:layout_marginBottom="10dp"
       android:text="How do people like this song ?"
       android:layout_gravity="center"/>
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="click"
+      android:id="@+id/testBtn" />
     
   <ListView android:layout_height="0dp"
       android:layout_weight="1"
@@ -26,24 +31,9 @@
       android:id="@+id/usersList"
       android:background="#F000" />
       
-  <LinearLayout
+  <ch.epfl.hello.RefreshBar
+      android:id="@+id/refreshBar"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      android:padding="10dp"
-      android:gravity="center">
-      
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginRight="10dp" />
-        
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading ..."/>
-      
-  </LinearLayout>
+      android:layout_height="wrap_content" />
 
 </LinearLayout>
