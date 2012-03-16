@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ch.epfl.hello"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="10" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name=".UnisonApp"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".Hello"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MusicList" android:label="@string/titleMusicList" />
+        <activity android:name=".RoomsActivity" android:label="@string/titleRooms" />
+        <activity android:name=".MusicPlayerActivity" android:label="@string/titlePlayer"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity android:name=".StatsActivity" android:label="@string/titleStats"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity android:name=".MainActivity" android:label="@string/titleMain"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <service android:exported="false" android:name=".MusicService">
+            <intent-filter>
+                <action android:name="ch.epfl.unison.action.TOGGLE_PLAYBACK" />
+                <action android:name="ch.epfl.unison.action.PLAY" />
+                <action android:name="ch.epfl.unison.action.PAUSE" />
+                <action android:name="ch.epfl.unison.action.STOP" />
+                
+            </intent-filter>
+            <intent-filter>
+                <action android:name="ch.epfl.unison.action.LOAD" />
+                <!-- This has been copied from the default android music app. -->
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="application/ogg"/>
+                <data android:mimeType="application/x-ogg"/>
+                <data android:mimeType="application/itunes"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="5dp">
+    
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+        
+      <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="0dp"
+          android:layout_weight="2"
+          android:textAppearance="?android:attr/textAppearanceMedium"
+          android:ellipsize="end"
+          android:singleLine="true"
+          android:id="@+id/textMusicList" />
+      
+      <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:gravity="right"
+          android:textAppearance="?android:attr/textAppearanceSmall"
+          android:singleLine="true"
+          android:ellipsize="end"
+          android:id="@+id/artistMusicList" />
+    </LinearLayout>
+    
+   
+
+    <RatingBar
+        android:isIndicator="false"
+        android:numStars="5"
+        android:rating="0.0"
+        android:stepSize="1.0"
+        android:id="@+id/ratingBarMusicList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+        
+
+</LinearLayout>

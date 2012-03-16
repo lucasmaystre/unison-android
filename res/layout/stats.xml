@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#3FFF" >
+    
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Jai Ho (You are my destiny)"
+      android:layout_gravity="center"
+      android:textStyle="bold"
+      android:layout_marginTop="10dp"
+      android:textAppearance="?android:attr/textAppearanceMedium"/>
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="10dp"
+      android:text="How do people like this song ?"
+      android:layout_gravity="center"/>
+    
+  <ListView android:layout_height="0dp"
+      android:layout_weight="1"
+      android:layout_width="fill_parent"
+      android:id="@+id/usersList"
+      android:background="#F000" />
+      
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:padding="10dp"
+      android:gravity="center">
+      
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginRight="10dp" />
+        
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading ..."/>
+      
+  </LinearLayout>
+
+</LinearLayout>

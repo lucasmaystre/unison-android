@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/musicMainLayout" >
+
+  <RelativeLayout
+      android:id="@+id/musicLayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="20dp">
+    
+    <!-- Artist -->  
+    <TextView
+        android:id="@+id/musicArtist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="The Pussycat Dolls"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+    <!-- Title --> 
+    <TextView
+        android:id="@+id/musicTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/musicArtist"
+        android:textStyle="bold"
+        android:text="Jai Ho (You are My)"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <!-- Album --> 
+    <TextView
+        android:id="@+id/musicAlbum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/musicTitle"
+        android:layout_centerHorizontal="true"
+        android:text="Unknown Album"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+    <!-- Position --> 
+    <ProgressBar
+        android:id="@+id/musicPositionBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/musicAlbum"
+        android:layout_centerHorizontal="true" />
+    
+    <!-- Duration -->
+    <TextView
+        android:id="@+id/musicDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/musicPositionBar"
+        android:layout_alignRight="@id/musicPositionBar"
+        android:text="3:32"
+        android:textAppearance="?android:attr/textAppearanceSmall" 
+        android:textColor="?android:attr/textColorTertiary" />
+        
+    <!-- Current position -->
+    <TextView
+        android:id="@+id/musicCurrentPosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/musicPositionBar"
+        android:layout_alignLeft="@id/musicPositionBar"
+        android:text="1:28"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+        
+    
+    <!-- Play / pause button -->   
+    <Button android:id="@+id/musicToggleBtn"
+        android:background="@drawable/btn_play"
+        android:layout_width="74dp"
+        android:layout_height="56dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/musicPositionBar" />
+        
+    <!-- Next button --> 
+    <Button android:id="@+id/musicNextBtn"
+        android:background="@drawable/btn_next"
+        android:layout_width="74dp"
+        android:layout_height="56dp"
+        android:layout_below="@id/musicPositionBar"
+        android:layout_alignRight="@id/musicPositionBar" />
+        
+    <!-- Previous button -->
+    <Button android:id="@+id/musicPrevBtn"
+        android:background="@drawable/btn_prev"
+        android:layout_width="74dp"
+        android:layout_height="56dp"
+        android:layout_below="@id/musicPositionBar"
+        android:layout_alignLeft="@id/musicPositionBar" />
+    
+  </RelativeLayout>
+  
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/musicLayout"
+      android:layout_alignParentLeft="true"
+      android:orientation="vertical"
+      android:background="#3FFF">
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rate this song :"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RatingBar
+        android:id="@+id/ratingBar1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_below="@id/textView1" />
+  </LinearLayout>
+      
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true">
+      
+    <ImageView
+      android:id="@+id/imageView1"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/ic_menu_cc" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="8 people in this room, listening to your music." />
+      
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="Leave DJ spot" />
+
+  </LinearLayout>
+
+  
+
+</RelativeLayout>
