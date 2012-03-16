@@ -6,4 +6,6 @@
         android:icon="@android:drawable/ic_menu_preferences" />
     <item android:id="@+id/itemPlayer" android:title="@string/titlePlayer"
         android:icon="@android:drawable/ic_menu_preferences" />
+    <item android:id="@+id/itemSettings" android:title="@string/titleSettings"
+        android:icon="@android:drawable/ic_menu_preferences" />
 </menu>

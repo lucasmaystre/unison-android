@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PrefsActivity" android:label="@string/titleSettings" />
         <activity android:name=".MusicList" android:label="@string/titleMusicList" />
         <activity android:name=".RoomsActivity" android:label="@string/titleRooms" />
         <activity android:name=".MusicPlayerActivity" android:label="@string/titlePlayer"
