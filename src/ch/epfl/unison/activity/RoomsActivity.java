@@ -48,6 +48,7 @@ public class RoomsActivity extends MenuActivity implements OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.rooms);
+        this.setTitle(R.string.activity_title_rooms);
 
         Button b = (Button)this.findViewById(R.id.createRoomBtn);
         b.setOnClickListener(this);
