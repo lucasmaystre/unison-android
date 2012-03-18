@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/itemMusicList" android:title="@string/titleMusicList"
-        android:icon="@android:drawable/ic_menu_preferences" />
-    <item android:id="@+id/itemRooms" android:title="@string/titleRooms"
-        android:icon="@android:drawable/ic_menu_preferences" />
-    <item android:id="@+id/itemPlayer" android:title="@string/titlePlayer"
-        android:icon="@android:drawable/ic_menu_preferences" />
-    <item android:id="@+id/itemSettings" android:title="@string/titleSettings"
-        android:icon="@android:drawable/ic_menu_preferences" />
+
+  <item android:id="@+id/menu_item_close"
+      android:title="@string/menu_title_close"
+      android:icon="@drawable/ic_menu_close" />
+
+  <item android:id="@+id/menu_item_ratings"
+      android:title="@string/activity_title_ratings"
+      android:icon="@drawable/ic_menu_star" />
+
+  <item android:id="@+id/menu_item_prefs"
+      android:title="@string/activity_title_prefs"
+      android:icon="@drawable/ic_menu_preferences" />
+
 </menu>

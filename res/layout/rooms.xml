@@ -17,44 +17,26 @@
         android:layout_weight="1"
         android:layout_marginRight="10dp"
         android:text="Create a room" />
-          
+
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="or select one below :"/>
-          
+
   </LinearLayout>
-    
-    
-    
+
   <!-- Text output wrapper -->
   <ListView
       android:layout_height="0dp"
       android:layout_width="match_parent"
       android:layout_weight="1"
       android:id="@+id/roomsList" />
-        
-        
-  <LinearLayout
+
+  <ch.epfl.unison.widget.RefreshBar
+      android:id="@+id/refreshBar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      android:padding="10dp"
-      android:gravity="center"
-      android:background="#3FFF">
-      
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginRight="10dp" />
-        
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading ..."/>
-      
-  </LinearLayout>
+      android:background="#3FFF" />
 
 </LinearLayout>

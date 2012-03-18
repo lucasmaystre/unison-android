@@ -1,6 +1,5 @@
-package ch.epfl.hello;
+package ch.epfl.unison.activity;
 
-import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,27 +12,33 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import ch.epfl.unison.R;
+import ch.epfl.unison.UnisonApp;
+import ch.epfl.unison.music.MusicService;
 
-public class MusicPlayerActivity extends Activity implements OnClickListener, Runnable {
+public class PlayerActivity extends MenuActivity implements OnClickListener, Runnable {
     private static final String TAG = "MusicPlayerActivity";
 
-    Button play;
-    Button pause;
+    Button toggle;
     ProgressBar position;
 
     private UnisonApp app;
     private Handler handler;
 
+    enum Status {
+        Stopped,
+        Playing,
+        Paused
+    }
+    Status status = Status.Stopped;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.musicplayer);
+        this.setContentView(R.layout.player);
 
-        play = (Button) this.findViewById(R.id.musicToggleBtn);
-        play.setOnClickListener(this);
-
-        pause = (Button) this.findViewById(R.id.musicNextBtn);
-        pause.setOnClickListener(this);
+        this.toggle = (Button) this.findViewById(R.id.musicToggleBtn);
+        this.toggle.setOnClickListener(this);
 
         this.position = (ProgressBar) this.findViewById(R.id.musicPositionBar);
 
@@ -42,14 +47,18 @@ public class MusicPlayerActivity extends Activity implements OnClickListener, Ru
     }
 
     public void onClick(View v) {
-        if (v == play) {
-            this.play();
-        } else if (v == pause) {
-            this.toggle();
+        if (v == this.toggle) {
+            if (this.status == Status.Stopped) {
+                this.load();
+            } else if (this.status == Status.Playing) {
+                this.pause();
+            } else { // this.status == Status.Paused)
+                this.play();
+            }
         }
     }
 
-    public void play() {
+    private void load() {
         String[] proj = { MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE };
         // Be careful here, this could return null.
         Cursor c = this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, null, null, null);
@@ -68,10 +77,21 @@ public class MusicPlayerActivity extends Activity implements OnClickListener, Ru
         this.startService(i);
         handler.post(this);
         //t.isAlive()
+
+        this.status = Status.Playing;
+        this.toggle.setBackgroundResource(R.drawable.btn_pause);
     }
 
-    public void toggle() {
-        this.startService(new Intent(MusicService.ACTION_TOGGLE_PLAYBACK));
+    private void pause() {
+        this.startService(new Intent(MusicService.ACTION_PAUSE));
+        this.status = Status.Paused;
+        this.toggle.setBackgroundResource(R.drawable.btn_play);
+    }
+
+    private void play() {
+        this.startService(new Intent(MusicService.ACTION_PLAY));
+        this.status = Status.Playing;
+        this.toggle.setBackgroundResource(R.drawable.btn_pause);
     }
 
     public void run() {

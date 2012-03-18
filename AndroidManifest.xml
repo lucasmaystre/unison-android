@@ -1,50 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.epfl.hello"
+    package="ch.epfl.unison"
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="10" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <!-- Requirements. -->
+  <uses-sdk android:minSdkVersion="10" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <application
-        android:name=".UnisonApp"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
-        <activity
-            android:name=".Hello"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".PrefsActivity" android:label="@string/titleSettings" />
-        <activity android:name=".MusicList" android:label="@string/titleMusicList" />
-        <activity android:name=".RoomsActivity" android:label="@string/titleRooms" />
-        <activity android:name=".MusicPlayerActivity" android:label="@string/titlePlayer"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <activity android:name=".StatsActivity" android:label="@string/titleStats"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <activity android:name=".MainActivity" android:label="@string/titleMain"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <service android:exported="false" android:name=".MusicService">
-            <intent-filter>
-                <action android:name="ch.epfl.unison.action.TOGGLE_PLAYBACK" />
-                <action android:name="ch.epfl.unison.action.PLAY" />
-                <action android:name="ch.epfl.unison.action.PAUSE" />
-                <action android:name="ch.epfl.unison.action.STOP" />
-                
-            </intent-filter>
-            <intent-filter>
-                <action android:name="ch.epfl.unison.action.LOAD" />
-                <!-- This has been copied from the default android music app. -->
-                <data android:mimeType="audio/*"/>
-                <data android:mimeType="application/ogg"/>
-                <data android:mimeType="application/x-ogg"/>
-                <data android:mimeType="application/itunes"/>
-            </intent-filter>
-        </service>
-    </application>
+  <application
+      android:name=".UnisonApp"
+      android:icon="@drawable/ic_launcher"
+      android:label="@string/app_name" >
+
+    <!-- Activities. -->
+    <activity android:name=".activity.PrefsActivity"
+        android:label="@string/activity_title_prefs" />
+
+    <activity android:name=".activity.RatingsActivity"
+        android:label="@string/activity_title_ratings" />
+
+    <activity android:name=".activity.RoomsActivity"
+        android:label="@string/activity_title_rooms">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <activity android:name=".activity.PlayerActivity"
+        android:label="@string/activity_title_player"
+        android:theme="@android:style/Theme.NoTitleBar" />
+
+    <activity android:name=".activity.StatsActivity"
+        android:label="@string/activity_title_stats"
+        android:theme="@android:style/Theme.NoTitleBar" />
+
+    <activity android:name=".activity.MainActivity"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.NoTitleBar" />
+
+    <!-- Services. -->
+    <service android:name=".music.MusicService"
+        export="false">
+      <intent-filter>
+        <action android:name="ch.epfl.unison.music.action.TOGGLE_PLAYBACK" />
+        <action android:name="ch.epfl.unison.music.action.PLAY" />
+        <action android:name="ch.epfl.unison.music.action.PAUSE" />
+        <action android:name="ch.epfl.unison.music.action.STOP" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="ch.epfl.unison.music.action.LOAD" />
+        <!-- This has been copied from the default android music app. -->
+        <data android:mimeType="audio/*"/>
+        <data android:mimeType="application/ogg"/>
+        <data android:mimeType="application/x-ogg"/>
+        <data android:mimeType="application/itunes"/>
+      </intent-filter>
+    </service>
+
+  </application>
 
 </manifest>

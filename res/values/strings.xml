@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Unison</string>
 
-    <string name="hello">Hello World, Hello!</string>
-    <string name="app_name">HelloAndroid</string>
-    <string name="titleMusicList">Music List</string>
-    <string name="titleRooms">Rooms</string>
-    <string name="titlePlayer">Music Player</string>
-    <string name="titleStats">Statistics</string>
-    <string name="titleMain">Unison</string>
-    <string name="titleSettings">Settings</string>
-    <string name="titleUsername">Username</string>
-    <string name="summaryUsername">The username will be seen by the people in the same room as you.</string>
+    <!-- Activity titles. -->
+    <string name="activity_title_ratings">Ratings</string>
+    <string name="activity_title_rooms">Rooms</string>
+    <string name="activity_title_player">Music</string>
+    <string name="activity_title_stats">Stats</string>
+    <string name="activity_title_prefs">Settings</string>
 
+    <!-- Menu. -->
+    <string name="menu_title_close">Quit room</string>
+
+    <!-- Preferences. -->
+    <string name="pref_title_username">Username</string>
+    <string name="pref_summary_username">The username will be seen by the people in the same room as you.</string>
+    <string name="pref_title_uuid">UUID</string>
+    <string name="pref_summary_uuid">A number that uniquely identifies you.</string>
+
+    <!-- Layouts. -->
 </resources>

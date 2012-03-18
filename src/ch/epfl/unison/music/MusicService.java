@@ -1,4 +1,4 @@
-package ch.epfl.hello;
+package ch.epfl.unison.music;
 
 import java.io.IOException;
 
@@ -15,6 +15,9 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import ch.epfl.unison.R;
+import ch.epfl.unison.UnisonApp;
+import ch.epfl.unison.activity.MainActivity;
 
 /**
  * Music player service. Inspired by the Android SDK's sample application,
@@ -30,11 +33,11 @@ public class MusicService extends Service
     private static final int NOTIFICATION_ID = 1;
     private static final float DUCK_VOLUME = 0.1f;
 
-    public static final String ACTION_PLAY = "ch.epfl.unison.action.PLAY";
-    public static final String ACTION_PAUSE = "ch.epfl.unison.action.PAUSE";
-    public static final String ACTION_STOP = "ch.epfl.unison.action.STOP";
-    public static final String ACTION_TOGGLE_PLAYBACK = "ch.epfl.unison.action.TOGGLE_PLAYBACK";
-    public static final String ACTION_LOAD = "ch.epfl.unison.action.LOAD";
+    public static final String ACTION_PLAY = "ch.epfl.unison.music.action.PLAY";
+    public static final String ACTION_PAUSE = "ch.epfl.unison.music.action.PAUSE";
+    public static final String ACTION_STOP = "ch.epfl.unison.music.action.STOP";
+    public static final String ACTION_TOGGLE_PLAYBACK = "ch.epfl.unison.music.action.TOGGLE_PLAYBACK";
+    public static final String ACTION_LOAD = "ch.epfl.unison.music.action.LOAD";
 
     private AudioFocusHelper focusHelper;
     private MediaPlayer mediaPlayer;

@@ -1,4 +1,4 @@
-package ch.epfl.hello;
+package ch.epfl.unison.activity;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -10,8 +10,9 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
+import ch.epfl.unison.R;
 
-public class MusicList extends Activity implements RatingBar.OnRatingBarChangeListener {
+public class RatingsActivity extends Activity implements RatingBar.OnRatingBarChangeListener {
 
     private SimpleCursorAdapter adapter;
     private ListView listMusicList;
@@ -26,7 +27,7 @@ public class MusicList extends Activity implements RatingBar.OnRatingBarChangeLi
                 return false;
             int n = (int)(6 * Math.random());
             ((RatingBar) view).setRating(n);
-            ((RatingBar) view).setOnRatingBarChangeListener(MusicList.this);
+            ((RatingBar) view).setOnRatingBarChangeListener(RatingsActivity.this);
             view.setTag(cursor.getInt(columnIndex));
             return true;
         }
@@ -35,7 +36,7 @@ public class MusicList extends Activity implements RatingBar.OnRatingBarChangeLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.musiclist_basic);
+        this.setContentView(R.layout.ratings);
 
         this.listMusicList = (ListView)this.findViewById(R.id.listMusicList);
     }
@@ -55,7 +56,7 @@ public class MusicList extends Activity implements RatingBar.OnRatingBarChangeLi
         Cursor c = this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, null, null, null);
         this.startManagingCursor(c);
 
-        adapter = new SimpleCursorAdapter(this, R.layout.row, c, FROM, TO);
+        adapter = new SimpleCursorAdapter(this, R.layout.ratings_row, c, FROM, TO);
         adapter.setViewBinder(viewBinder);
         this.listMusicList.setAdapter(adapter);
 

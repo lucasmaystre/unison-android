@@ -6,27 +6,25 @@
       android:layout_gravity="center"
       android:gravity="center"
       android:orientation="horizontal">
-      
+
     <ProgressBar
         android:id="@+id/refreshBarProgress"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginRight="10dp" />
-      
+
     <TextView
         android:id="@+id/refreshBarText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Loading ..."/>
   </LinearLayout>
-  
+
   <Button
       android:id="@+id/refreshBarBtn"
-      android:layout_width="200sp"
+      android:layout_width="100sp"
       android:layout_height="wrap_content"
       android:text="refresh"
       android:layout_gravity="center"/>
-  
-      
+
 </merge>
-  

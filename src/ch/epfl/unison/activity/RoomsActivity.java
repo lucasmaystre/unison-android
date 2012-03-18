@@ -1,34 +1,45 @@
-package ch.epfl.hello;
+package ch.epfl.unison.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import ch.epfl.unison.R;
+import ch.epfl.unison.widget.RefreshBar;
+import ch.epfl.unison.widget.RefreshBar.OnRefreshListener;
 
-public class RoomsActivity extends Activity implements OnClickListener {
+public class RoomsActivity extends MenuActivity implements OnClickListener,
+        OnItemClickListener, Runnable, OnRefreshListener {
 
     private List<HashMap<String, String>> data;
     private ListView roomsList;
     private SimpleAdapter adapter;
+
+    private RefreshBar refreshBar;
+    private Handler handler;
 
     private final SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
         public boolean setViewValue(View view, Object data,
                 String textRepresentation) {
             if (view.getId() != R.id.nbParticipants)
                 return false;
-            ((TextView) view).append(textRepresentation + " people in this room.");
+            ((TextView) view).setText(textRepresentation + " people in this room.");
             return true;
         }
     };
@@ -49,6 +60,11 @@ public class RoomsActivity extends Activity implements OnClickListener {
         this.data.add(new HashMap<String, String>() {{ put("n", "blabla"); put("p", "0"); }});
 
         this.roomsList = (ListView)this.findViewById(R.id.roomsList);
+        this.roomsList.setOnItemClickListener(this);
+
+        this.refreshBar = (RefreshBar)this.findViewById(R.id.refreshBar);
+        this.refreshBar.setOnRefreshListener(this);
+        this.handler = new Handler();
     }
 
     @Override
@@ -60,6 +76,9 @@ public class RoomsActivity extends Activity implements OnClickListener {
         this.adapter = new SimpleAdapter(this, this.data, R.layout.rooms_row, from, to);
         this.adapter.setViewBinder(this.viewBinder);
         this.roomsList.setAdapter(adapter);
+
+        this.refreshBar.setState(RefreshBar.REFRESHING);
+        this.handler.postDelayed(this, 1000);
     }
 
     public void onClick(View v) {
@@ -87,5 +106,28 @@ public class RoomsActivity extends Activity implements OnClickListener {
         });
 
         alert.show();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        menu.getItem(ITEM_CLOSE).setEnabled(false);
+        return true;
+    }
+
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        this.startActivity(new Intent(this, MainActivity.class));
+    }
+
+    public void run() {
+        if (this.refreshBar.getState() == RefreshBar.REFRESHING) {
+            this.refreshBar.setState(RefreshBar.READY);
+        } else {
+            this.refreshBar.setState(RefreshBar.REFRESHING);
+            this.handler.postDelayed(this, 1000);
+        }
+    }
+
+    public void onRefresh() {
+        this.handler.post(this);
     }
 }

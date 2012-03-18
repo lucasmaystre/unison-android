@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#3FFF" >
-    
+
   <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -19,19 +19,14 @@
       android:layout_marginBottom="10dp"
       android:text="How do people like this song ?"
       android:layout_gravity="center"/>
-  <Button
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="click"
-      android:id="@+id/testBtn" />
-    
+
   <ListView android:layout_height="0dp"
       android:layout_weight="1"
       android:layout_width="fill_parent"
       android:id="@+id/usersList"
       android:background="#F000" />
-      
-  <ch.epfl.hello.RefreshBar
+
+  <ch.epfl.unison.widget.RefreshBar
       android:id="@+id/refreshBar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content" />

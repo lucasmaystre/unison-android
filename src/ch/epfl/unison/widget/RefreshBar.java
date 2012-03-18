@@ -1,4 +1,4 @@
-package ch.epfl.hello;
+package ch.epfl.unison.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ViewAnimator;
+import ch.epfl.unison.R;
 
 public class RefreshBar extends ViewAnimator implements OnClickListener {
 
@@ -23,7 +24,6 @@ public class RefreshBar extends ViewAnimator implements OnClickListener {
 
         this.setAnimateFirstView(true);
         this.setInAnimation(getContext(), R.anim.fade_in);
-        this.setOutAnimation(getContext(), R.anim.fade_out);
 
         LayoutInflater.from(context).inflate(R.layout.refresh_bar, this, true);
 
@@ -43,6 +43,10 @@ public class RefreshBar extends ViewAnimator implements OnClickListener {
     public void setState(int state) {
         this.setDisplayedChild(state);
         //this.showNext();
+    }
+
+    public int getState() {
+        return this.getDisplayedChild();
     }
 
     /** A simple interface to handle clicks on the refresh button. */

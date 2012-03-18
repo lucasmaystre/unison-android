@@ -1,4 +1,4 @@
-package ch.epfl.hello;
+package ch.epfl.unison.music;
 
 import android.content.Context;
 import android.media.AudioManager;

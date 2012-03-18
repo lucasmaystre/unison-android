@@ -1,4 +1,4 @@
-package ch.epfl.hello;
+package ch.epfl.unison;
 
 import android.app.Application;
 import android.media.MediaPlayer;

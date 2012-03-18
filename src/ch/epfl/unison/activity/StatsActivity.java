@@ -1,29 +1,31 @@
-package ch.epfl.hello;
+package ch.epfl.unison.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
+import ch.epfl.unison.R;
+import ch.epfl.unison.widget.RefreshBar;
+import ch.epfl.unison.widget.RefreshBar.OnRefreshListener;
 
-public class StatsActivity extends Activity implements OnClickListener, RefreshBar.OnRefreshListener {
+public class StatsActivity extends MenuActivity implements OnClickListener,
+        OnRefreshListener, Runnable {
     private static final String TAG = "ch.epfl.unison.StatsActivity";
 
     private List<HashMap<String, String>> data;
 
     private ListView usersList;
     private SimpleAdapter adapter;
-
-    private Button testButton;
     private RefreshBar refreshBar;
+
+    private Handler handler;
 
     private final SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
         public boolean setViewValue(View view, Object data,
@@ -55,12 +57,11 @@ public class StatsActivity extends Activity implements OnClickListener, RefreshB
         this.data.add(new HashMap<String, String>() {{ put("u", "user9832"); put("r", "51"); }});
 
         this.usersList = (ListView)this.findViewById(R.id.usersList);
-        this.testButton = (Button) this.findViewById(R.id.testBtn);
-        this.testButton.setOnClickListener(this);
 
         this.refreshBar = (RefreshBar) this.findViewById(R.id.refreshBar);
         this.refreshBar.setOnRefreshListener(this);
 
+        this.handler = new Handler();
     }
 
     @Override
@@ -73,11 +74,8 @@ public class StatsActivity extends Activity implements OnClickListener, RefreshB
         this.adapter.setViewBinder(this.viewBinder);
         this.usersList.setAdapter(adapter);
 
-        //c.moveToFirst();
-        //for (boolean hasItem = c.moveToFirst(); hasItem; hasItem = c.moveToNext()) {
-        //  String title = c.getString(c.getColumnIndex(MediaStore.Audio.Media.TITLE));
-        //  this.textMusicList.append(title + "\n");
-        //}
+        this.refreshBar.setState(RefreshBar.REFRESHING);
+        this.handler.postDelayed(this, 1000);
     }
 
     public void onClick(View v) {
@@ -85,8 +83,16 @@ public class StatsActivity extends Activity implements OnClickListener, RefreshB
         this.refreshBar.setState(RefreshBar.READY);
     }
 
+    public void run() {
+        if (this.refreshBar.getState() == RefreshBar.REFRESHING) {
+            this.refreshBar.setState(RefreshBar.READY);
+        } else {
+            this.refreshBar.setState(RefreshBar.REFRESHING);
+            this.handler.postDelayed(this, 1000);
+        }
+    }
+
     public void onRefresh() {
-        // TODO Auto-generated method stub
-        Log.i(TAG, "helloworld");
+        this.handler.post(this);
     }
 }
