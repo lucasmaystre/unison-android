@@ -1,6 +1,5 @@
-package ch.epfl.unison.activity;
+package ch.epfl.unison.ui;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,7 +11,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import ch.epfl.unison.R;
 
-public class RatingsActivity extends Activity implements RatingBar.OnRatingBarChangeListener {
+import com.actionbarsherlock.app.SherlockActivity;
+
+public class RatingsActivity extends SherlockActivity implements RatingBar.OnRatingBarChangeListener {
 
     private SimpleCursorAdapter adapter;
     private ListView listMusicList;
@@ -37,6 +38,7 @@ public class RatingsActivity extends Activity implements RatingBar.OnRatingBarCh
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.ratings);
+        this.setTitle(R.string.activity_title_ratings);
 
         this.listMusicList = (ListView)this.findViewById(R.id.listMusicList);
     }

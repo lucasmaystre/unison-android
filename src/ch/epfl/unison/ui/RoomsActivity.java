@@ -1,4 +1,4 @@
-package ch.epfl.unison.activity;
+package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -21,18 +20,21 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import ch.epfl.unison.R;
-import ch.epfl.unison.widget.RefreshBar;
-import ch.epfl.unison.widget.RefreshBar.OnRefreshListener;
 
-public class RoomsActivity extends MenuActivity implements OnClickListener,
-        OnItemClickListener, Runnable, OnRefreshListener {
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
+
+public class RoomsActivity extends SherlockActivity implements OnClickListener,
+        OnItemClickListener, Runnable, UnisonMenu.OnRefreshListener {
 
     private List<HashMap<String, String>> data;
     private ListView roomsList;
     private SimpleAdapter adapter;
 
-    private RefreshBar refreshBar;
     private Handler handler;
+    private boolean isRefreshing;
 
     private final SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
         public boolean setViewValue(View view, Object data,
@@ -47,6 +49,7 @@ public class RoomsActivity extends MenuActivity implements OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         this.setContentView(R.layout.rooms);
         this.setTitle(R.string.activity_title_rooms);
 
@@ -63,8 +66,6 @@ public class RoomsActivity extends MenuActivity implements OnClickListener,
         this.roomsList = (ListView)this.findViewById(R.id.roomsList);
         this.roomsList.setOnItemClickListener(this);
 
-        this.refreshBar = (RefreshBar)this.findViewById(R.id.refreshBar);
-        this.refreshBar.setOnRefreshListener(this);
         this.handler = new Handler();
     }
 
@@ -78,8 +79,8 @@ public class RoomsActivity extends MenuActivity implements OnClickListener,
         this.adapter.setViewBinder(this.viewBinder);
         this.roomsList.setAdapter(adapter);
 
-        this.refreshBar.setState(RefreshBar.REFRESHING);
-        this.handler.postDelayed(this, 1000);
+        this.isRefreshing = false;
+        this.handler.post(this);
     }
 
     public void onClick(View v) {
@@ -110,9 +111,13 @@ public class RoomsActivity extends MenuActivity implements OnClickListener,
     }
 
     @Override
-    public boolean onPrepareOptionsMenu (Menu menu) {
-        menu.getItem(ITEM_CLOSE).setEnabled(false);
-        return true;
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return UnisonMenu.onCreateOptionsMenu(this, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return UnisonMenu.onOptionsItemSelected(this, this, item);
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -120,12 +125,13 @@ public class RoomsActivity extends MenuActivity implements OnClickListener,
     }
 
     public void run() {
-        if (this.refreshBar.getState() == RefreshBar.REFRESHING) {
-            this.refreshBar.setState(RefreshBar.READY);
+        if (this.isRefreshing) {
+            this.isRefreshing = false;
         } else {
-            this.refreshBar.setState(RefreshBar.REFRESHING);
+            this.isRefreshing = true;
             this.handler.postDelayed(this, 1000);
         }
+        this.setSupportProgressBarIndeterminateVisibility(this.isRefreshing);
     }
 
     public void onRefresh() {

@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Unison</string>
+    <string name="app_name">GroupStreamer</string>
 
     <!-- Activity titles. -->
     <string name="activity_title_ratings">Ratings</string>
     <string name="activity_title_rooms">Rooms</string>
-    <string name="activity_title_player">Music</string>
-    <string name="activity_title_stats">Stats</string>
     <string name="activity_title_prefs">Settings</string>
 
+    <!-- Fragment titles -->
+    <string name="fragment_title_player">Music</string>
+    <string name="fragment_title_stats">Stats</string>
+
     <!-- Menu. -->
-    <string name="menu_title_close">Quit room</string>
+    <string name="menu_title_refresh">Refresh</string>
 
     <!-- Preferences. -->
     <string name="pref_title_username">Username</string>

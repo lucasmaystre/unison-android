@@ -17,7 +17,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import ch.epfl.unison.R;
 import ch.epfl.unison.UnisonApp;
-import ch.epfl.unison.activity.MainActivity;
+import ch.epfl.unison.ui.MainActivity;
 
 /**
  * Music player service. Inspired by the Android SDK's sample application,

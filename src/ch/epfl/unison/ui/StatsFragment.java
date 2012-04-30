@@ -1,31 +1,27 @@
-package ch.epfl.unison.activity;
+package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import android.os.Bundle;
-import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import ch.epfl.unison.R;
-import ch.epfl.unison.widget.RefreshBar;
-import ch.epfl.unison.widget.RefreshBar.OnRefreshListener;
 
-public class StatsActivity extends MenuActivity implements OnClickListener,
-        OnRefreshListener, Runnable {
+import com.actionbarsherlock.app.SherlockFragment;
+
+public class StatsFragment extends SherlockFragment {
     private static final String TAG = "ch.epfl.unison.StatsActivity";
 
     private List<HashMap<String, String>> data;
 
     private ListView usersList;
     private SimpleAdapter adapter;
-    private RefreshBar refreshBar;
-
-    private Handler handler;
 
     private final SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
         public boolean setViewValue(View view, Object data,
@@ -40,9 +36,9 @@ public class StatsActivity extends MenuActivity implements OnClickListener,
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.stats);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.stats, container, false);
 
         this.data = new ArrayList<HashMap<String, String>>();
         this.data.add(new HashMap<String, String>() {{ put("u", "bengiuliano");  put("r", "67"); }});
@@ -56,12 +52,9 @@ public class StatsActivity extends MenuActivity implements OnClickListener,
         this.data.add(new HashMap<String, String>() {{ put("u", "user29384"); put("r", "69"); }});
         this.data.add(new HashMap<String, String>() {{ put("u", "user9832"); put("r", "51"); }});
 
-        this.usersList = (ListView)this.findViewById(R.id.usersList);
+        this.usersList = (ListView)v.findViewById(R.id.usersList);
 
-        this.refreshBar = (RefreshBar) this.findViewById(R.id.refreshBar);
-        this.refreshBar.setOnRefreshListener(this);
-
-        this.handler = new Handler();
+        return v;
     }
 
     @Override
@@ -70,29 +63,8 @@ public class StatsActivity extends MenuActivity implements OnClickListener,
 
         String[] from = {"u", "r"};
         int[] to = {R.id.username, R.id.liking};
-        this.adapter = new SimpleAdapter(this, this.data, R.layout.stats_row, from, to);
+        this.adapter = new SimpleAdapter(this.getActivity(), this.data, R.layout.stats_row, from, to);
         this.adapter.setViewBinder(this.viewBinder);
         this.usersList.setAdapter(adapter);
-
-        this.refreshBar.setState(RefreshBar.REFRESHING);
-        this.handler.postDelayed(this, 1000);
-    }
-
-    public void onClick(View v) {
-        // TODO Auto-generated method stub
-        this.refreshBar.setState(RefreshBar.READY);
-    }
-
-    public void run() {
-        if (this.refreshBar.getState() == RefreshBar.REFRESHING) {
-            this.refreshBar.setState(RefreshBar.READY);
-        } else {
-            this.refreshBar.setState(RefreshBar.REFRESHING);
-            this.handler.postDelayed(this, 1000);
-        }
-    }
-
-    public void onRefresh() {
-        this.handler.post(this);
     }
 }

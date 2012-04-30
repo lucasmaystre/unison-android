@@ -1,0 +1,50 @@
+package ch.epfl.unison.ui;
+
+import android.app.Activity;
+import android.content.Intent;
+import ch.epfl.unison.R;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+/**
+ * Abstract base class for all activities that give access to the menu.
+ *
+ * @author lum
+ */
+public abstract class UnisonMenu {
+
+    public static boolean onCreateOptionsMenu(SherlockActivity activity, Menu menu) {
+        MenuInflater inflater = activity.getSupportMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    public static boolean onCreateOptionsMenu(SherlockFragmentActivity activity, Menu menu) {
+        MenuInflater inflater = activity.getSupportMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    public static boolean onOptionsItemSelected(Activity activity, OnRefreshListener listener, MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_item_refresh:
+            listener.onRefresh();
+        break;
+        case R.id.menu_item_ratings:
+            activity.startActivity(new Intent(activity, RatingsActivity.class));
+        break;
+        case R.id.menu_item_prefs:
+            activity.startActivity(new Intent(activity, PrefsActivity.class));
+        break;
+        }
+        return true;
+    }
+
+    public static interface OnRefreshListener {
+        public void onRefresh();
+    }
+}
