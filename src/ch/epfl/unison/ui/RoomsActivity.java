@@ -1,86 +1,81 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.epfl.unison.R;
+import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.JsonStruct.RoomsList;
+import ch.epfl.unison.api.UnisonAPI;
+import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 
 public class RoomsActivity extends SherlockActivity implements OnClickListener,
-        OnItemClickListener, Runnable, UnisonMenu.OnRefreshListener {
+        OnItemClickListener, UnisonMenu.OnRefreshListener {
 
-    private List<HashMap<String, String>> data;
     private ListView roomsList;
-    private SimpleAdapter adapter;
+    private Menu menu;
 
-    private Handler handler;
-    private boolean isRefreshing;
-
-    private final SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
-        public boolean setViewValue(View view, Object data,
-                String textRepresentation) {
-            if (view.getId() != R.id.nbParticipants)
-                return false;
-            ((TextView) view).setText(textRepresentation + " people in this room.");
-            return true;
-        }
-    };
+    private UnisonAPI api;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         this.setContentView(R.layout.rooms);
         this.setTitle(R.string.activity_title_rooms);
 
         Button b = (Button)this.findViewById(R.id.createRoomBtn);
         b.setOnClickListener(this);
 
-        this.data = new ArrayList<HashMap<String, String>>();
-        this.data.add(new HashMap<String, String>() {{ put("n", "Rock party");  put("p", "14"); }});
-        this.data.add(new HashMap<String, String>() {{ put("n", "BC 246"); put("p", "2"); }});
-        this.data.add(new HashMap<String, String>() {{ put("n", "Joel's birthday"); put("p", "7"); }});
-        this.data.add(new HashMap<String, String>() {{ put("n", "Maelys' home"); put("p", "10"); }});
-        this.data.add(new HashMap<String, String>() {{ put("n", "blabla"); put("p", "0"); }});
-
         this.roomsList = (ListView)this.findViewById(R.id.roomsList);
         this.roomsList.setOnItemClickListener(this);
 
-        this.handler = new Handler();
+        this.api = new UnisonAPI("a@gs.com", "h3ll0");
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        this.onRefresh(null);
+    }
 
-        String[] from = {"n", "p"};
-        int[] to = {R.id.roomName, R.id.nbParticipants};
-        this.adapter = new SimpleAdapter(this, this.data, R.layout.rooms_row, from, to);
-        this.adapter.setViewBinder(this.viewBinder);
-        this.roomsList.setAdapter(adapter);
+    private class RoomsAdapter extends ArrayAdapter<JsonStruct.Room> {
+        public static final int ROW_LAYOUT = R.layout.rooms_row;
 
-        this.isRefreshing = false;
-        this.handler.post(this);
+        public RoomsAdapter(JsonStruct.RoomsList list) {
+            super(RoomsActivity.this, 0, list.rooms);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) RoomsActivity.this.getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(ROW_LAYOUT, parent, false);
+            }
+            ((TextView) view.findViewById(R.id.roomName)).setText(this.getItem(position).name);
+            ((TextView) view.findViewById(R.id.nbParticipants))
+                    .setText(this.getItem(position).nbUsers + " people in this room.");
+            return view;
+        }
     }
 
     public void onClick(View v) {
@@ -95,23 +90,27 @@ public class RoomsActivity extends SherlockActivity implements OnClickListener,
 
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-              // Do something with value!
               String name = input.getText().toString();
-              Log.w("bla", name);
+              RoomsActivity.this.api.createRoom(name, new UnisonAPI.Handler<JsonStruct.RoomsList>() {
+
+                public void callback(RoomsList struct) {
+                    RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
+                }
+
+                public void onError(Error error) {
+                    Toast.makeText(RoomsActivity.this, error.jsonError.message, Toast.LENGTH_SHORT).show();
+                }
+              });
             }
           });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int whichButton) {
-            // Cancelled.
-          }
-        });
-
+        alert.setNegativeButton("Cancel", null);
         alert.show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
     }
 
@@ -124,17 +123,39 @@ public class RoomsActivity extends SherlockActivity implements OnClickListener,
         this.startActivity(new Intent(this, MainActivity.class));
     }
 
-    public void run() {
-        if (this.isRefreshing) {
-            this.isRefreshing = false;
-        } else {
-            this.isRefreshing = true;
-            this.handler.postDelayed(this, 1000);
-        }
-        this.setSupportProgressBarIndeterminateVisibility(this.isRefreshing);
+    public void onRefresh(MenuItem item) {
+        this.repaintRefresh(true);
+        this.api.listRooms(new UnisonAPI.Handler<JsonStruct.RoomsList>() {
+
+            public void callback(RoomsList struct) {
+                RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
+                RoomsActivity.this.repaintRefresh(false);
+                Toast.makeText(RoomsActivity.this, "Rooms loaded", Toast.LENGTH_SHORT).show();
+            }
+
+            public void onError(UnisonAPI.Error error) {
+                Toast.makeText(RoomsActivity.this, error.jsonError.message, Toast.LENGTH_LONG).show();
+                RoomsActivity.this.repaintRefresh(false);
+            }
+
+        });
     }
 
-    public void onRefresh() {
-        this.handler.post(this);
+    public void repaintRefresh(boolean isRefreshing) {
+        if (this.menu == null) {
+            return;
+        }
+
+        MenuItem refreshItem = this.menu.findItem(R.id.menu_item_refresh);
+        if (refreshItem != null) {
+            if (isRefreshing) {
+                LayoutInflater inflater = (LayoutInflater)getSupportActionBar()
+                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View refreshView = inflater.inflate(R.layout.actionbar_indeterminate_progress, null);
+                refreshItem.setActionView(refreshView);
+            } else {
+                refreshItem.setActionView(null);
+            }
+        }
     }
 }
