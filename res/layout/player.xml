@@ -31,17 +31,6 @@
         android:text="Wasted Days"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <!-- Album -->
-    <TextView
-        android:id="@+id/musicAlbum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_below="@id/musicTitle"
-        android:layout_centerHorizontal="true"
-        android:text="Attack On Memory"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
     <!-- Position -->
     <ProgressBar
         android:id="@+id/musicPositionBar"
@@ -49,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_below="@id/musicAlbum"
+        android:layout_below="@id/musicTitle"
         android:layout_centerHorizontal="true" />
 
     <!-- Duration -->

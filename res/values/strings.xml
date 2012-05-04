@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GroupStreamer</string>
+    <string name="app_name">Group Streamer</string>
 
     <!-- Activity titles. -->
     <string name="activity_title_ratings">Ratings</string>

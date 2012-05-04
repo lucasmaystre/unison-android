@@ -136,7 +136,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         public void onTabReselected(Tab tab, FragmentTransaction ft) {}
     }
 
-    public void onRefresh() {
+    public void onRefresh(MenuItem item) {
         // TODO Auto-generated method stub
 
     }

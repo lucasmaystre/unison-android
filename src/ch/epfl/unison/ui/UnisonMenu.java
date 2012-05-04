@@ -32,7 +32,7 @@ public abstract class UnisonMenu {
     public static boolean onOptionsItemSelected(Activity activity, OnRefreshListener listener, MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_item_refresh:
-            listener.onRefresh();
+            listener.onRefresh(item);
         break;
         case R.id.menu_item_ratings:
             activity.startActivity(new Intent(activity, RatingsActivity.class));
@@ -40,11 +40,20 @@ public abstract class UnisonMenu {
         case R.id.menu_item_prefs:
             activity.startActivity(new Intent(activity, PrefsActivity.class));
         break;
+        case android.R.id.home:
+            // app icon in Action Bar clicked; go home
+            Intent intent = new Intent(activity, RoomsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            activity.startActivity(intent);
+            return true;
+        default:
+            // Should never happen.
+            break;
         }
         return true;
     }
 
     public static interface OnRefreshListener {
-        public void onRefresh();
+        public void onRefresh(MenuItem item);
     }
 }

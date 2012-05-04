@@ -3,34 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    
-    <LinearLayout android:orientation="horizontal"
-        android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:gravity="center"
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="0dp"
         android:background="#3FFF">
-        
+
+      <TextView android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Ratings improve GroupStreamer's effectiveness."/>
+
       <CheckBox
           android:id="@+id/checkBox1"
-          android:layout_width="0dp"
-          android:layout_weight="1"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Show only unrated" />
-          
-      <TextView android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:text="Rating songs improves Unison's effectiveness."/>
-          
+          android:text="Show only unrated songs" />
+
     </LinearLayout>
-    
-    
-    
+
+
+
     <!-- Text output wrapper -->
     <ListView
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:id="@+id/listMusicList" />
-    
-    
+
+
 </LinearLayout>
