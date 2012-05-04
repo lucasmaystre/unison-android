@@ -52,6 +52,7 @@
         <data android:mimeType="application/itunes"/>
       </intent-filter>
     </service>
+    <service android:name=".LibraryService" />
 
   </application>
 
