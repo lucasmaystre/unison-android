@@ -58,7 +58,13 @@
         <data android:mimeType="application/itunes"/>
       </intent-filter>
     </service>
-    <service android:name=".LibraryService" />
+    <service android:name=".LibraryService"
+        android:exported="false">
+      <intent-filter>
+        <action android:name="ch.epfl.unison.action.UPDATE" />
+        <action android:name="ch.epfl.unison.action.TRUNCATE" />
+      </intent-filter>
+    </service>
 
   </application>
 

@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.RoomsList;
@@ -54,6 +55,7 @@ public class RoomsActivity extends SherlockActivity implements OnClickListener,
     public void onResume() {
         super.onResume();
         this.onRefresh(null);
+        this.startService(new Intent(LibraryService.ACTION_UPDATE));
     }
 
     private class RoomsAdapter extends ArrayAdapter<JsonStruct.Room> {
