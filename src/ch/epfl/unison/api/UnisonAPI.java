@@ -2,13 +2,21 @@ package ch.epfl.unison.api;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 import android.util.Base64;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class UnisonAPI {
 
+    @SuppressWarnings("unused")
+    private static final String TAG = "ch.epfl.unison.UnisonAPI";
+
     private static final String API_ROOT = "https://api.groupstreamer.com";
+    private static final Gson GSON = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
     private String auth;
 
@@ -31,143 +39,143 @@ public class UnisonAPI {
 
     public void login(Handler<JsonStruct.User> handler) {
         URL url = urlFor("/");
-        AsyncRequest.create(url, handler, JsonStruct.User.class)
+        AsyncRequest.of(url, handler, JsonStruct.User.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void createUser(String email, String password,
             Handler<JsonStruct.User> handler) {
         URL url = urlFor("/users");
-        AsyncRequest.create(url, handler, JsonStruct.User.class)
+        AsyncRequest.of(url, handler, JsonStruct.User.class)
                 .addParam("email", email).addParam("password", password).doPOST();
     }
 
     public void getNickname(long uid, Handler<JsonStruct.User> handler) {
         URL url = urlFor("/users/%d/nickname", uid);
-        AsyncRequest.create(url, handler, JsonStruct.User.class)
+        AsyncRequest.of(url, handler, JsonStruct.User.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void setNickname(long uid, String nickname, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/nickname", uid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("nickname", nickname).setAuth(this.auth).doPUT();
     }
 
     public void setEmail(long uid, String email, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/email", uid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("email", email).setAuth(this.auth).doPUT();
     }
 
     public void setPassword(long uid, String password, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/password", uid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("password", password).setAuth(this.auth).doPUT();
     }
 
     public void joinRoom(long uid, long rid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/room", uid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("rid", rid).setAuth(this.auth).doPUT();
     }
 
     public void leaveRoom(long uid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/room", uid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(this.auth).doDELETE();
     }
 
     public void listRooms(Handler<JsonStruct.RoomsList> handler) {
         URL url = urlFor("/rooms");
-        AsyncRequest.create(url, handler, JsonStruct.RoomsList.class)
+        AsyncRequest.of(url, handler, JsonStruct.RoomsList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void createRoom(String name, Handler<JsonStruct.RoomsList> handler) {
         URL url = urlFor("/rooms");
-        AsyncRequest.create(url, handler, JsonStruct.RoomsList.class)
+        AsyncRequest.of(url, handler, JsonStruct.RoomsList.class)
                 .addParam("name", name).setAuth(this.auth).doPOST();
     }
 
     public void getRoomInfo(long rid, Handler<JsonStruct.Room> handler) {
         URL url = urlFor("/rooms/%d", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Room.class)
+        AsyncRequest.of(url, handler, JsonStruct.Room.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void getNextTrack(long rid, Handler<JsonStruct.Track> handler) {
         URL url = urlFor("/rooms/%d", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Track.class)
+        AsyncRequest.of(url, handler, JsonStruct.Track.class)
                 .setAuth(this.auth).doPOST();
     }
 
     public void setCurrentTrack(long rid, String artist, String title,
             Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/rooms/%d/current", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("artist", artist).addParam("title", title)
                 .setAuth(this.auth).doPOST();
     }
 
     public void skipTrack(long rid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/rooms/%d/current", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(this.auth).doDELETE();
     }
 
     public void instantRate(long rid, String artist, String title, int rating,
             Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/rooms/%d/ratings", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("artist", artist).addParam("title", title).addParam("rating", rating)
                 .setAuth(this.auth).doPOST();
     }
 
     public void becomeMaster(long rid, long uid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/rooms/%d/master", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("uid", uid).setAuth(this.auth).doPUT();
     }
 
     public void resignMaster(long rid, long uid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/rooms/%d/master", rid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(this.auth).doDELETE();
     }
 
-    public void uploadLibrary(long uid, List<JsonStruct.Track> tracks,
-            Handler<JsonStruct.Success> handler) {
+    public Request.Result<JsonStruct.Success> uploadLibrarySync(
+            long uid, Iterable<JsonStruct.Track> tracks) {
         URL url = urlFor("/libentries/%d", uid);
-        AsyncRequest<JsonStruct.Success> request = AsyncRequest.create(
-                url, handler, JsonStruct.Success.class).setAuth(this.auth);
+        Request<JsonStruct.Success> request = Request.of(url, JsonStruct.Success.class)
+                .setAuth(this.auth);
         for (JsonStruct.Track track : tracks) {
-            request.addParam("entry", track);
+            request.addParam("entry", GSON.toJson(track));
         }
-        request.doPUT();
+        return request.doPUT();
     }
 
-    public void updateLibrary(long uid, List<JsonStruct.Delta> deltas,
-            Handler<JsonStruct.Success> handler) {
+    public Request.Result<JsonStruct.Success> updateLibrarySync(
+            long uid, Iterable<JsonStruct.Delta> deltas) {
         URL url = urlFor("/libentries/%d/batch", uid);
-        AsyncRequest<JsonStruct.Success> request = AsyncRequest.create(
-                url, handler, JsonStruct.Success.class).setAuth(this.auth);
+        Request<JsonStruct.Success> request = Request.of(url, JsonStruct.Success.class)
+                .setAuth(this.auth);
         for (JsonStruct.Delta delta : deltas) {
-            request.addParam("delta", delta);
+            request.addParam("delta", GSON.toJson(delta));
         }
-        request.doPOST();
+        return request.doPOST();
     }
 
     public void getRatings(long uid, Handler<JsonStruct.RatingsList> handler) {
         URL url = urlFor("/libentries/%d/ratings", uid);
-        AsyncRequest.create(url, handler, JsonStruct.RatingsList.class)
+        AsyncRequest.of(url, handler, JsonStruct.RatingsList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void rate(long uid, String artist, String title, int rating,
             Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/libentries/%d/ratings", uid);
-        AsyncRequest.create(url, handler, JsonStruct.Success.class).setAuth(this.auth)
+        AsyncRequest.of(url, handler, JsonStruct.Success.class).setAuth(this.auth)
                 .addParam("artist", artist).addParam("title", title).addParam("rating", rating);
     }
 
