@@ -25,6 +25,8 @@ import com.actionbarsherlock.app.SherlockActivity;
 
 public class LoginActivity extends SherlockActivity {
 
+    private static final String TAG = "ch.epfl.unison.LoginActivity";
+
     private Button loginBtn;
     private TextView signupTxt;
 
@@ -127,8 +129,12 @@ public class LoginActivity extends SherlockActivity {
             }
 
             public void onError(Error error) {
-                Toast.makeText(LoginActivity.this, "error. "+error.error, Toast.LENGTH_LONG).show();
-                Log.d("bla", error.error.toString(), error.error);
+                if (error.hasJsonError()) {
+                    Toast.makeText(LoginActivity.this, error.jsonError.message, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "error.", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "Unknown error", error.error);
+                }
                 dialog.dismiss();
             }
         });
