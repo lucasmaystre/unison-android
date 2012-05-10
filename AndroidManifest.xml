@@ -24,6 +24,12 @@
 
     <activity android:name=".ui.RoomsActivity"
         android:label="@string/app_name">
+    </activity>
+
+    <activity android:name=".ui.LoginActivity"
+        android:label="@string/app_name"
+        android:noHistory="true"
+        android:theme="@style/Theme.Sherlock.NoActionBar">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
@@ -36,7 +42,7 @@
 
     <!-- Services. -->
     <service android:name=".music.MusicService"
-        export="false">
+        android:exported="false">
       <intent-filter>
         <action android:name="ch.epfl.unison.music.action.TOGGLE_PLAYBACK" />
         <action android:name="ch.epfl.unison.music.action.PLAY" />

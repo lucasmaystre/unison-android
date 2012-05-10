@@ -13,6 +13,7 @@
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
+    <string name="menu_title_logout">Log Out</string>
 
     <!-- Preferences. -->
     <string name="pref_title_username">Username</string>

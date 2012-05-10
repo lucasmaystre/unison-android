@@ -40,11 +40,16 @@ public abstract class UnisonMenu {
         case R.id.menu_item_prefs:
             activity.startActivity(new Intent(activity, PrefsActivity.class));
         break;
+        case R.id.menu_item_logout:
+            Intent logoutIntent = new Intent(activity, LoginActivity.class);
+            logoutIntent.putExtra("logout", true);
+            activity.startActivity(logoutIntent);
+        break;
         case android.R.id.home:
             // app icon in Action Bar clicked; go home
-            Intent intent = new Intent(activity, RoomsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            activity.startActivity(intent);
+            Intent homeIntent = new Intent(activity, RoomsActivity.class);
+            homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            activity.startActivity(homeIntent);
             return true;
         default:
             // Should never happen.

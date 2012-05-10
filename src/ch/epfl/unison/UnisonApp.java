@@ -20,6 +20,8 @@ public class UnisonApp extends Application
     private UnisonAPI api;
     private SharedPreferences prefs;
 
+    private Long currentRoomId;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -34,10 +36,22 @@ public class UnisonApp extends Application
             if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
                 this.api = new UnisonAPI(email, password);
             } else {
-                // Start login activity???
+                this.api = new UnisonAPI();
             }
         }
         return this.api;
+    }
+
+    public void setCurrentRoom(Long rid) {
+        this.currentRoomId = rid;
+    }
+
+    public Long getCurrentRoom() {
+        return this.currentRoomId;
+    }
+
+    public long getUid() {
+        return this.prefs.getLong("uid", -1);
     }
 
     public void setMediaPlayer(MediaPlayer mediaPlayer) {
@@ -64,7 +78,8 @@ public class UnisonApp extends Application
 
     public synchronized void onSharedPreferenceChanged(
             SharedPreferences sharedPreferences, String key) {
-        if (key.equals("email") || key.equals("password"))
-        this.api = null;
+        if (key.equals("email") || key.equals("password") || key.equals("uid")) {
+            this.api = null;
+        }
     }
 }
