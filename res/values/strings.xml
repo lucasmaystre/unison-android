@@ -6,9 +6,10 @@
     <string name="activity_title_ratings">Ratings</string>
     <string name="activity_title_rooms">Rooms</string>
     <string name="activity_title_prefs">Settings</string>
+    <string name="activity_title_main">Room</string>
 
     <!-- Fragment titles -->
-    <string name="fragment_title_player">Music</string>
+    <string name="fragment_title_music">Music</string>
     <string name="fragment_title_stats">Stats</string>
 
     <!-- Menu. -->

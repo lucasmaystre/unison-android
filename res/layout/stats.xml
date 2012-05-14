@@ -6,6 +6,7 @@
     android:background="#3FFF" >
 
   <TextView
+      android:id="@+id/trackTitle"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="Jai Ho (You are my destiny)"
@@ -20,7 +21,8 @@
       android:text="How do people like this song ?"
       android:layout_gravity="center"/>
 
-  <ListView android:layout_height="0dp"
+  <ListView
+      android:layout_height="0dp"
       android:layout_weight="1"
       android:layout_width="fill_parent"
       android:id="@+id/usersList"

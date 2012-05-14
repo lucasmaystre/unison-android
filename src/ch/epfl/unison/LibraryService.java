@@ -143,8 +143,8 @@ public class LibraryService extends Service {
             Log.d(TAG, "number of deltas: " + deltas.size());
 
             // Sending the updates to the server.
-            UnisonAPI api = ((UnisonApp) LibraryService.this.getApplication()).getAPI();
-            long uid = ((UnisonApp) LibraryService.this.getApplication()).getUid();
+            UnisonAPI api = AppData.getInstance(LibraryService.this).getAPI();
+            long uid = AppData.getInstance(LibraryService.this).getUid();
 
             Request.Result<JsonStruct.Success> res = api.updateLibrarySync(uid, deltas);
             if (res.result == null) {
@@ -184,8 +184,8 @@ public class LibraryService extends Service {
             }
 
             // Sending the updates to the server.
-            UnisonAPI api = ((UnisonApp) LibraryService.this.getApplication()).getAPI();
-            long uid = ((UnisonApp) LibraryService.this.getApplication()).getUid();
+            UnisonAPI api = AppData.getInstance(LibraryService.this).getAPI();
+            long uid = AppData.getInstance(LibraryService.this).getUid();
 
             Request.Result<JsonStruct.Success> res = api.uploadLibrarySync(uid, tracks);
             if (res.result == null) {

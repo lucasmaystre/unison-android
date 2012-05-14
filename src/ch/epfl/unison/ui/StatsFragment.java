@@ -1,70 +1,82 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import ch.epfl.unison.R;
+import ch.epfl.unison.api.JsonStruct;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-public class StatsFragment extends SherlockFragment {
+public class StatsFragment extends SherlockFragment implements MainActivity.OnRoomInfoListener {
+
+    @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
 
-    private List<HashMap<String, String>> data;
-
     private ListView usersList;
-    private SimpleAdapter adapter;
+    private TextView trackTitle;
 
-    private final SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
-        public boolean setViewValue(View view, Object data,
-                String textRepresentation) {
-            if (view.getId() != R.id.liking)
-                return false;
-            int r = Integer.valueOf(textRepresentation);
-            ((ProgressBar) view).setMax(100);
-            ((ProgressBar) view).setProgress(r);
-            return true;
-        }
-    };
+    private MainActivity activity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.stats, container, false);
 
-        this.data = new ArrayList<HashMap<String, String>>();
-        this.data.add(new HashMap<String, String>() {{ put("u", "bengiuliano");  put("r", "67"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "lum"); put("r", "92"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "melody"); put("r", "13"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "william"); put("r", "100"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "gilbert95"); put("r", "36"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "da_pro_xxx"); put("r", "78"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "kikoulol"); put("r", "85"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "blabla"); put("r", "94"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "user29384"); put("r", "69"); }});
-        this.data.add(new HashMap<String, String>() {{ put("u", "user9832"); put("r", "51"); }});
-
         this.usersList = (ListView)v.findViewById(R.id.usersList);
+        this.trackTitle = (TextView)v.findViewById(R.id.trackTitle);
 
         return v;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void onRoomInfo(JsonStruct.Room roomInfo) {
+        if (roomInfo.track != null && roomInfo.track.title != null) {
+            this.trackTitle.setText(roomInfo.track.title);
+        }
+        this.usersList.setAdapter(new StatsAdapter(roomInfo));
+    }
 
-        String[] from = {"u", "r"};
-        int[] to = {R.id.username, R.id.liking};
-        this.adapter = new SimpleAdapter(this.getActivity(), this.data, R.layout.stats_row, from, to);
-        this.adapter.setViewBinder(this.viewBinder);
-        this.usersList.setAdapter(adapter);
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = (MainActivity) activity;
+        this.activity.registerRoomInfoListener(this);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.activity.unregisterRoomInfoListener(this);
+    }
+
+    private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
+
+        public static final int ROW_LAYOUT = R.layout.stats_row;
+
+        public StatsAdapter(JsonStruct.Room room) {
+            super(StatsFragment.this.getActivity(), 0, room.users);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) StatsFragment.this.getActivity()
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(ROW_LAYOUT, parent, false);
+            }
+            ((TextView) view.findViewById(R.id.username)).setText(this.getItem(position).nickname);
+            int score = getItem(position).score != null ? getItem(position).score : 0;
+            ((ProgressBar) view.findViewById(R.id.liking)).setProgress(score);
+
+            return view;
+        }
     }
 }

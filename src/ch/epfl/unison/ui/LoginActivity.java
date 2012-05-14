@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
-import ch.epfl.unison.UnisonApp;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
@@ -33,14 +32,10 @@ public class LoginActivity extends SherlockActivity {
     private EditText email;
     private EditText password;
 
-    private UnisonApp app;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.login);
-
-        this.app = (UnisonApp) this.getApplication();
 
         this.email = (EditText) findViewById(R.id.email);
         this.password = (EditText) findViewById(R.id.password);
@@ -95,7 +90,7 @@ public class LoginActivity extends SherlockActivity {
         this.password.setText(prefs.getString("password", null));
     }
 
-    private void storeInfo(String email, String password, String nickname, Long uid, Long rid) {
+    private void storeInfo(String email, String password, String nickname, Long uid) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -104,14 +99,15 @@ public class LoginActivity extends SherlockActivity {
         editor.putString("nickname", nickname);
         editor.putLong("uid", uid != null ? uid : -1);
         editor.commit();
-
-        this.app.setCurrentRoom(rid);
     }
 
-    private void nextActivity() {
-        if (this.app.getCurrentRoom() != null) {
-            this.startActivity(new Intent(this, MainActivity.class));
+    private void nextActivity(Long rid) {
+        if (rid != null) {
+            // Directly go into room.
+            this.startActivity(new Intent(this, MainActivity.class)
+                    .putExtra("rid", rid));
         } else {
+            // Display list of rooms.
             this.startActivity(new Intent(this, RoomsActivity.class));
         }
     }
@@ -122,9 +118,8 @@ public class LoginActivity extends SherlockActivity {
         api.login(new UnisonAPI.Handler<JsonStruct.User>() {
 
             public void callback(JsonStruct.User struct) {
-                LoginActivity.this.storeInfo(email, password,
-                        struct.nickname, struct.uid, struct.rid);
-                LoginActivity.this.nextActivity();
+                LoginActivity.this.storeInfo(email, password, struct.nickname, struct.uid);
+                LoginActivity.this.nextActivity(struct.rid);
                 dialog.dismiss();
             }
 

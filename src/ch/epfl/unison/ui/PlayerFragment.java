@@ -29,6 +29,8 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     private UnisonApp app;
     private Handler handler;
 
+    Button dj;
+
     enum Status {
         Stopped,
         Playing,
@@ -50,6 +52,9 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         this.toggle = (Button) v.findViewById(R.id.musicToggleBtn);
         this.toggle.setOnClickListener(this);
 
+        this.dj = (Button) v.findViewById(R.id.button1);
+        this.dj.setOnClickListener(this);
+
         this.position = (ProgressBar) v.findViewById(R.id.musicPositionBar);
 
         this.app = (UnisonApp) this.getActivity().getApplicationContext();
@@ -67,13 +72,19 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             } else { // this.status == Status.Paused)
                 this.play();
             }
+        } else if (v == this.dj) {
+            Log.d(TAG, "we should soon call drawListener...");
+            this.startActivity(new Intent(this.getActivity(), MainActivity.class)
+                    .putExtra("listener", true));
+            this.getActivity().finish();
         }
     }
 
     private void load() {
         String[] proj = { MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE };
         // Be careful here, this could return null.
-        Cursor c = this.getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, null, null, null);
+        Cursor c = this.getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj,
+                MediaStore.Audio.Media.IS_MUSIC + " = 1", null, null);
         this.getActivity().startManagingCursor(c);
         c.moveToFirst();
 

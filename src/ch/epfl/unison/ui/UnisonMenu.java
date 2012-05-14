@@ -32,7 +32,7 @@ public abstract class UnisonMenu {
     public static boolean onOptionsItemSelected(Activity activity, OnRefreshListener listener, MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_item_refresh:
-            listener.onRefresh(item);
+            listener.onRefresh();
         break;
         case R.id.menu_item_ratings:
             activity.startActivity(new Intent(activity, RatingsActivity.class));
@@ -59,6 +59,6 @@ public abstract class UnisonMenu {
     }
 
     public static interface OnRefreshListener {
-        public void onRefresh(MenuItem item);
+        public void onRefresh();
     }
 }

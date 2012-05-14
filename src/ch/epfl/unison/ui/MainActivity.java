@@ -1,6 +1,8 @@
 package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,7 +10,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Toast;
+import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
+import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.UnisonAPI;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -17,37 +25,106 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
+
     private static final String TAG = "MainActivity";
 
-    TabsAdapter tabsAdapter;
-    ViewPager viewPager;
+    private TabsAdapter tabsAdapter;
+    private ViewPager viewPager;
+    private Menu menu;
+
+    private Set<OnRoomInfoListener> listeners = new HashSet<OnRoomInfoListener>();
+
+    private long roomId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Class<?> clazz = PlayerFragment.class;
+
+        Bundle extras = this.getIntent().getExtras();
+        if (extras != null) {
+            this.roomId = extras.getLong("rid", 1);
+            if (extras.containsKey("name")) {
+                this.setTitle(extras.getString("name"));
+            } else {
+                UnisonAPI api = AppData.getInstance(this).getAPI();
+                api.getRoomInfo(this.roomId, new UnisonAPI.Handler<JsonStruct.Room>() {
+
+                    public void callback(JsonStruct.Room struct) {
+                        MainActivity.this.setTitle(struct.name);
+                    }
+
+                    public void onError(UnisonAPI.Error error) {}
+
+                });
+            }
+
+            if (extras.getBoolean("listener", false)) {
+                clazz = ListenerFragment.class;
+            }
+        }
 
         viewPager = new ViewPager(this);
         viewPager.setId(R.id.realtabcontent); // TODO change
         this.setContentView(this.viewPager);
 
-        this.setTitle("BC 219");
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
         this.tabsAdapter = new TabsAdapter(this, this.viewPager);
-
-        this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
-                PlayerFragment.class, null);
-
+        this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_music),
+                clazz, null);
         this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
                 StatsFragment.class, null);
+    }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.onRefresh();
+    }
+
+    public void repaintRefresh(boolean isRefreshing) {
+        if (this.menu == null) {
+            return;
+        }
+
+        MenuItem refreshItem = this.menu.findItem(R.id.menu_item_refresh);
+        if (refreshItem != null) {
+            if (isRefreshing) {
+                LayoutInflater inflater = (LayoutInflater)getSupportActionBar()
+                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View refreshView = inflater.inflate(R.layout.actionbar_indeterminate_progress, null);
+                refreshItem.setActionView(refreshView);
+            } else {
+                refreshItem.setActionView(null);
+            }
+        }
+    }
+
+    public void onRefresh() {
+        this.repaintRefresh(true);
+        UnisonAPI api = AppData.getInstance(this).getAPI();
+        api.getRoomInfo(this.roomId, new UnisonAPI.Handler<JsonStruct.Room>() {
+
+            public void callback(JsonStruct.Room struct) {
+                MainActivity.this.dispatchRoomInfo(struct);
+                MainActivity.this.repaintRefresh(false);
+            }
+
+            public void onError(UnisonAPI.Error error) {
+                Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
+                MainActivity.this.repaintRefresh(false);
+            }
+
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
     }
 
@@ -55,6 +132,25 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     public boolean onOptionsItemSelected(MenuItem item) {
         return UnisonMenu.onOptionsItemSelected(this, this, item);
     }
+
+    public void dispatchRoomInfo(JsonStruct.Room roomInfo) {
+        for (OnRoomInfoListener listener : this.listeners) {
+            listener.onRoomInfo(roomInfo);
+        }
+    }
+
+    public void registerRoomInfoListener(OnRoomInfoListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void unregisterRoomInfoListener(OnRoomInfoListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    public static interface OnRoomInfoListener {
+        public void onRoomInfo(JsonStruct.Room roomInfo);
+    }
+
 
     /**
      * This is a helper class that implements the management of tabs and all
@@ -113,13 +209,11 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             return Fragment.instantiate(mContext, info.clss.getName(), info.args);
         }
 
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        }
-
         public void onPageSelected(int position) {
             mActionBar.setSelectedNavigationItem(position);
         }
 
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
         public void onPageScrollStateChanged(int state) {}
 
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
@@ -134,10 +228,5 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
         public void onTabReselected(Tab tab, FragmentTransaction ft) {}
-    }
-
-    public void onRefresh(MenuItem item) {
-        // TODO Auto-generated method stub
-
     }
 }
