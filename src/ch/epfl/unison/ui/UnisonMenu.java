@@ -17,6 +17,8 @@ import com.actionbarsherlock.view.MenuItem;
  */
 public abstract class UnisonMenu {
 
+    public static final String ACTION_LOGOUT = "ch.epfl.unison.action.LOGOUT";
+
     public static boolean onCreateOptionsMenu(SherlockActivity activity, Menu menu) {
         MenuInflater inflater = activity.getSupportMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -44,6 +46,8 @@ public abstract class UnisonMenu {
             Intent logoutIntent = new Intent(activity, LoginActivity.class);
             logoutIntent.putExtra("logout", true);
             activity.startActivity(logoutIntent);
+            // Send broadcast to all activities that can only be used when logged in.
+            activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
         break;
         case android.R.id.home:
             // app icon in Action Bar clicked; go home

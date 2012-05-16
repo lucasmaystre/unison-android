@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -77,7 +75,7 @@ public class LoginActivity extends SherlockActivity {
             String email = prefs.getString("email", null);
             String password = prefs.getString("password", null);
 
-            if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+            if (email != null && password != null) {
                 this.login(email, password);
             }
         }
@@ -101,11 +99,11 @@ public class LoginActivity extends SherlockActivity {
         editor.commit();
     }
 
-    private void nextActivity(Long rid) {
-        if (rid != null) {
+    private void nextActivity(JsonStruct.User user) {
+        if (user.rid != null) {
             // Directly go into room.
             this.startActivity(new Intent(this, MainActivity.class)
-                    .putExtra("rid", rid));
+                    .putExtra("rid", user.rid));
         } else {
             // Display list of rooms.
             this.startActivity(new Intent(this, RoomsActivity.class));
@@ -117,19 +115,14 @@ public class LoginActivity extends SherlockActivity {
         UnisonAPI api = new UnisonAPI(email, password);
         api.login(new UnisonAPI.Handler<JsonStruct.User>() {
 
-            public void callback(JsonStruct.User struct) {
-                LoginActivity.this.storeInfo(email, password, struct.nickname, struct.uid);
-                LoginActivity.this.nextActivity(struct.rid);
+            public void callback(JsonStruct.User user) {
+                LoginActivity.this.storeInfo(email, password, user.nickname, user.uid);
+                LoginActivity.this.nextActivity(user);
                 dialog.dismiss();
             }
 
             public void onError(Error error) {
-                if (error.hasJsonError()) {
-                    Toast.makeText(LoginActivity.this, error.jsonError.message, Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(LoginActivity.this, "error.", Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Unknown error", error.error);
-                }
+                Toast.makeText(LoginActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             }
         });

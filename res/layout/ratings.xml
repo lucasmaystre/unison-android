@@ -18,9 +18,10 @@
           android:text="Ratings improve GroupStreamer's effectiveness."/>
 
       <CheckBox
-          android:id="@+id/checkBox1"
+          android:id="@+id/unratedCheckBox"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:enabled="false"
           android:text="Show only unrated songs" />
 
     </LinearLayout>

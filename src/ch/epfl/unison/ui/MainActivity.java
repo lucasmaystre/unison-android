@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -26,46 +30,63 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "ch.epfl.unison.MainActivity";
+    private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
 
     private TabsAdapter tabsAdapter;
     private ViewPager viewPager;
     private Menu menu;
 
+    private boolean isForeground = false;
+    private Handler handler = new Handler();
+    private Runnable updater = new Runnable() {
+        public void run() {
+            if (isForeground) {
+                onRefresh();
+                handler.postDelayed(this, RELOAD_INTERVAL);
+            }
+        }
+    };
+
+    private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
+
     private Set<OnRoomInfoListener> listeners = new HashSet<OnRoomInfoListener>();
+    private MusicServiceListener musicServiceListener;
 
     private long roomId;
+
+    public long getRoomId() {
+        return this.roomId;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Class<?> clazz = PlayerFragment.class;
+
+        // This activity should finish on logout.
+        this.registerReceiver(this.logoutReceiver,
+                new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         Bundle extras = this.getIntent().getExtras();
-        if (extras != null) {
-            this.roomId = extras.getLong("rid", 1);
-            if (extras.containsKey("name")) {
-                this.setTitle(extras.getString("name"));
-            } else {
-                UnisonAPI api = AppData.getInstance(this).getAPI();
-                api.getRoomInfo(this.roomId, new UnisonAPI.Handler<JsonStruct.Room>() {
-
-                    public void callback(JsonStruct.Room struct) {
-                        MainActivity.this.setTitle(struct.name);
-                    }
-
-                    public void onError(UnisonAPI.Error error) {}
-
-                });
-            }
-
-            if (extras.getBoolean("listener", false)) {
-                clazz = ListenerFragment.class;
-            }
+        if (extras == null || !extras.containsKey("rid")) {
+            // Should never happen. If it does, redirect the user to the rooms list.
+            this.startActivity(new Intent(this, RoomsActivity.class));
+            this.finish();
         }
 
-        viewPager = new ViewPager(this);
-        viewPager.setId(R.id.realtabcontent); // TODO change
+        this.roomId = extras.getLong("rid");
+        if (extras.containsKey("name")) {
+            this.setTitle(extras.getString("name"));
+        }
+
+        // Set up the tabs & stuff.
+        this.viewPager = new ViewPager(this);
+        this.viewPager.setId(R.id.realtabcontent); // TODO change
         this.setContentView(this.viewPager);
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -73,17 +94,40 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         this.tabsAdapter = new TabsAdapter(this, this.viewPager);
-        this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_music),
-                clazz, null);
+        this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
+                PlayerFragment.class, null);
         this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
                 StatsFragment.class, null);
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // Used as a kind of callback.
+        super.onNewIntent(intent);
+        Bundle extras = intent.getExtras();
+        if (extras != null && extras.getBoolean("completed")
+                && this.musicServiceListener != null) {
+            this.musicServiceListener.onCompletion();
+        }
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        this.onRefresh();
+        this.isForeground = true;
+        this.handler.post(updater);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.isForeground = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(this.logoutReceiver);
     }
 
     public void repaintRefresh(boolean isRefreshing) {
@@ -110,16 +154,21 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         api.getRoomInfo(this.roomId, new UnisonAPI.Handler<JsonStruct.Room>() {
 
             public void callback(JsonStruct.Room struct) {
+                MainActivity.this.onRoomInfo(struct);
                 MainActivity.this.dispatchRoomInfo(struct);
                 MainActivity.this.repaintRefresh(false);
             }
 
             public void onError(UnisonAPI.Error error) {
-                Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 MainActivity.this.repaintRefresh(false);
             }
 
         });
+    }
+
+    private void onRoomInfo(JsonStruct.Room room) {
+        this.setTitle(room.name);
     }
 
     @Override
@@ -149,6 +198,14 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
 
     public static interface OnRoomInfoListener {
         public void onRoomInfo(JsonStruct.Room roomInfo);
+    }
+
+    public void setMusicServiceListener(MusicServiceListener listener) {
+        this.musicServiceListener = listener;
+    }
+
+    public static interface MusicServiceListener {
+        public void onCompletion();
     }
 
 

@@ -22,8 +22,6 @@
         android:hint="E-mail address"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp" >
-
-        <requestFocus />
     </EditText>
 
     <EditText

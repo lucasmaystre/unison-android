@@ -2,148 +2,100 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:id="@+id/musicMainLayout" >
 
-  <RelativeLayout
+  <ch.epfl.unison.ui.AspectRatioImageView
+      android:id="@+id/musicCover"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:src="@drawable/cover"
+      android:contentDescription="album cover"
+      android:scaleType="fitStart" />
+
+  <LinearLayout
       android:id="@+id/musicLayout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="#7000"
       android:padding="20dp">
+
 
     <!-- Artist -->
     <TextView
         android:id="@+id/musicArtist"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:gravity="center"
         android:text="Cloud Nothings"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <!-- Title -->
     <TextView
         android:id="@+id/musicTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:gravity="center"
         android:layout_below="@id/musicArtist"
         android:textStyle="bold"
         android:text="Wasted Days"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <!-- Position -->
-    <ProgressBar
-        android:id="@+id/musicPositionBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
+  </LinearLayout>
+
+
+  <LinearLayout
+      android:id="@+id/musicActions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_alignParentBottom="true"
+      android:padding="10dp">
+
+    <Button
+        android:id="@+id/djToggleBtn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_below="@id/musicTitle"
-        android:layout_centerHorizontal="true" />
+        android:text="Become the DJ" />
 
-    <!-- Duration -->
-    <TextView
-        android:id="@+id/musicDuration"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/ratingBtn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_above="@id/musicPositionBar"
-        android:layout_alignRight="@id/musicPositionBar"
-        android:text="3:32"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorTertiary" />
+        android:text="Rating" />
+  </LinearLayout>
 
-    <!-- Current position -->
-    <TextView
-        android:id="@+id/musicCurrentPosition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/musicPositionBar"
-        android:layout_alignLeft="@id/musicPositionBar"
-        android:text="1:28"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-
+  <RelativeLayout
+      android:id="@+id/musicButtons"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignBottom="@id/musicCover"
+      android:background="#4FFF"
+      android:visibility="invisible">
 
     <!-- Play / pause button -->
     <Button android:id="@+id/musicToggleBtn"
         android:background="@drawable/btn_play"
         android:layout_width="74dp"
         android:layout_height="56dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/musicPositionBar" />
+        android:layout_centerHorizontal="true" />
 
     <!-- Next button -->
     <Button android:id="@+id/musicNextBtn"
         android:background="@drawable/btn_next"
         android:layout_width="74dp"
         android:layout_height="56dp"
-        android:layout_below="@id/musicPositionBar"
-        android:layout_alignRight="@id/musicPositionBar" />
+        android:layout_alignParentRight="true" />
 
     <!-- Previous button -->
     <Button android:id="@+id/musicPrevBtn"
         android:background="@drawable/btn_prev"
         android:layout_width="74dp"
         android:layout_height="56dp"
-        android:layout_below="@id/musicPositionBar"
-        android:layout_alignLeft="@id/musicPositionBar" />
+        android:layout_alignParentLeft="true" />
 
   </RelativeLayout>
-
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@id/musicLayout"
-      android:layout_alignParentLeft="true"
-      android:orientation="vertical"
-      android:background="#3FFF">
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Rate this song :"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <RatingBar
-        android:id="@+id/ratingBar1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:numStars="5"
-        android:rating="0.0"
-        android:stepSize="1.0"/>
-  </LinearLayout>
-
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true">
-
-    <ImageView
-      android:id="@+id/imageView1"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:src="@drawable/ic_contact" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_weight="1"
-        android:layout_gravity="center"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="8 people in this room, listening to your music." />
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:text="Leave DJ spot" />
-
-  </LinearLayout>
-
-
 
 </RelativeLayout>

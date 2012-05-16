@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 import ch.epfl.unison.api.UnisonAPI;
 
 public class AppData implements OnSharedPreferenceChangeListener {
@@ -23,7 +22,7 @@ public class AppData implements OnSharedPreferenceChangeListener {
         if (this.api == null) {
             String email = this.prefs.getString("email", null);
             String password = this.prefs.getString("password", null);
-            if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+            if (email != null && password != null) {
                 this.api = new UnisonAPI(email, password);
             } else {
                 this.api = new UnisonAPI();

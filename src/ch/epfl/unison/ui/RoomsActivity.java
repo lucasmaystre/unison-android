@@ -1,10 +1,14 @@
 package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +26,7 @@ import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.RoomsList;
+import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
@@ -31,18 +36,43 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
+    private static final String TAG = "ch.epfl.unison.RoomsActivity";
+    private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
+
     private ListView roomsList;
-    JsonStruct.Room[] rooms;
     private Menu menu;
+
+    private boolean isForeground = false;
+    private Handler handler = new Handler();
+    private Runnable updater = new Runnable() {
+        public void run() {
+            if (isForeground) {
+                onRefresh();
+                handler.postDelayed(this, RELOAD_INTERVAL);
+            }
+        }
+    };
+
+    private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // This activity should finish on logout.
+        this.registerReceiver(this.logoutReceiver,
+                new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+
         this.setContentView(R.layout.rooms);
         this.setTitle(R.string.activity_title_rooms);
 
-        Button b = (Button)this.findViewById(R.id.createRoomBtn);
-        b.setOnClickListener(new OnCreateRoomListener());
+        ((Button)this.findViewById(R.id.createRoomBtn))
+                .setOnClickListener(new OnCreateRoomListener());
 
         this.roomsList = (ListView)this.findViewById(R.id.roomsList);
         this.roomsList.setOnItemClickListener(new OnRoomSelectedListener());
@@ -51,9 +81,36 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
     @Override
     public void onResume() {
         super.onResume();
-        this.onRefresh();
+        this.isForeground = true;
         this.startService(new Intent(LibraryService.ACTION_UPDATE));
+
+        // Make sure the user is not marked as present in any room.
+        AppData data = AppData.getInstance(this);
+        data.getAPI().leaveRoom(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+
+            public void callback(Success struct) {
+                Log.d(TAG, "successfully left room");
+                handler.post(updater);
+            }
+
+            public void onError(Error error) {
+                Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                handler.post(updater);
+            }
+        });
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.isForeground = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(this.logoutReceiver);
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,14 +129,12 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         api.listRooms(new UnisonAPI.Handler<JsonStruct.RoomsList>() {
 
             public void callback(RoomsList struct) {
-                RoomsActivity.this.rooms = struct.rooms;
                 RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
                 RoomsActivity.this.repaintRefresh(false);
-                Toast.makeText(RoomsActivity.this, "Rooms loaded", Toast.LENGTH_SHORT).show();
             }
 
             public void onError(UnisonAPI.Error error) {
-                Toast.makeText(RoomsActivity.this, error.jsonError.message, Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 RoomsActivity.this.repaintRefresh(false);
             }
 
@@ -113,8 +168,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
+        public View getView(int position, View view, ViewGroup parent) {
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) RoomsActivity.this.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
@@ -123,6 +177,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
             ((TextView) view.findViewById(R.id.roomName)).setText(this.getItem(position).name);
             ((TextView) view.findViewById(R.id.nbParticipants))
                     .setText(this.getItem(position).nbUsers + " people in this room.");
+            view.setTag(this.getItem(position));
             return view;
         }
     }
@@ -142,8 +197,8 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int whichButton) {
-
                     String name = input.getText().toString();
+
                     UnisonAPI api = AppData.getInstance(RoomsActivity.this).getAPI();
                     api.createRoom(name, new UnisonAPI.Handler<JsonStruct.RoomsList>() {
 
@@ -152,8 +207,8 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                         }
 
                         public void onError(Error error) {
-                            Toast.makeText(RoomsActivity.this, "error, couldn't create room",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RoomsActivity.this, error.toString(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -161,16 +216,28 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
 
             alert.setNegativeButton("Cancel", null);
             alert.show();
-
         }
     }
 
     private class OnRoomSelectedListener implements OnItemClickListener {
 
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
-            RoomsActivity.this.startActivity(new Intent(RoomsActivity.this, MainActivity.class)
-                    .putExtra("rid", RoomsActivity.this.rooms[position].rid)
-                    .putExtra("name", RoomsActivity.this.rooms[position].name));
+            UnisonAPI api = AppData.getInstance(RoomsActivity.this).getAPI();
+            long uid = AppData.getInstance(RoomsActivity.this).getUid();
+            final JsonStruct.Room room = (JsonStruct.Room) view.getTag();
+
+            api.joinRoom(uid, room.rid, new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                public void callback(Success struct) {
+                    RoomsActivity.this.startActivity(new Intent(RoomsActivity.this, MainActivity.class)
+                            .putExtra("rid", room.rid).putExtra("name", room.name));
+                }
+
+                public void onError(Error error) {
+                    Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                }
+
+            });
         }
     }
 }

@@ -9,7 +9,7 @@
     <string name="activity_title_main">Room</string>
 
     <!-- Fragment titles -->
-    <string name="fragment_title_music">Music</string>
+    <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
 
     <!-- Menu. -->

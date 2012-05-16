@@ -115,7 +115,7 @@ public class UnisonAPI {
         URL url = urlFor("/rooms/%d/current", rid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("artist", artist).addParam("title", title)
-                .setAuth(this.auth).doPOST();
+                .setAuth(this.auth).doPUT();
     }
 
     public void skipTrack(long rid, Handler<JsonStruct.Success> handler) {
@@ -176,7 +176,8 @@ public class UnisonAPI {
             Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/libentries/%d/ratings", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class).setAuth(this.auth)
-                .addParam("artist", artist).addParam("title", title).addParam("rating", rating);
+                .addParam("artist", artist).addParam("title", title)
+                .addParam("rating", rating).doPOST();
     }
 
     private static URL urlFor(String suffix, Object... objects) {
@@ -188,7 +189,7 @@ public class UnisonAPI {
     }
 
     public static interface Handler<S extends JsonStruct> {
-        public void callback(S structure);
+        public void callback(S struct);
         public void onError(UnisonAPI.Error error);
     }
 
@@ -221,6 +222,17 @@ public class UnisonAPI {
 
         public boolean hasJsonError() {
             return this.jsonError != null;
+        }
+
+        @Override
+        public String toString() {
+            if (this.hasJsonError()) {
+                return String.format("JSON error:\ncode: %d\nmessage: %s",
+                        this.jsonError.error, this.jsonError.message);
+            } else {
+                return String.format("Error type: %s\nstatus: %d\nresponse: %s",
+                        this.error.getClass().toString(), this.statusCode, this.response);
+            }
         }
     }
 

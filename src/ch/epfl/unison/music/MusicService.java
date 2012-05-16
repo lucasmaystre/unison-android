@@ -12,11 +12,11 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import ch.epfl.unison.R;
-import ch.epfl.unison.UnisonApp;
 import ch.epfl.unison.ui.MainActivity;
 
 /**
@@ -43,10 +43,9 @@ public class MusicService extends Service
     private MediaPlayer mediaPlayer;
     private Notification notification;
 
-    private UnisonApp app;
+    MusicServiceBinder binder = new MusicServiceBinder();
 
     // State variables.
-
     enum State {
         Stopped,   // Media player is stopped.
         Preparing, // Media player is preparing
@@ -65,7 +64,6 @@ public class MusicService extends Service
     @Override
     public void onCreate() {
         this.focusHelper = new AudioFocusHelper(getApplicationContext(), this);
-        this.app = (UnisonApp) this.getApplicationContext();
     }
 
     @Override
@@ -168,8 +166,6 @@ public class MusicService extends Service
         this.mediaPlayer.setOnPreparedListener(this);
         this.mediaPlayer.setOnCompletionListener(this);
         this.mediaPlayer.setOnErrorListener(this);
-
-        this.app.setMediaPlayer(this.mediaPlayer);
     }
 
     /**
@@ -220,7 +216,6 @@ public class MusicService extends Service
             this.mediaPlayer.reset();
             this.mediaPlayer.release();
             this.mediaPlayer = null;
-            this.app.setMediaPlayer(null);
         }
     }
 
@@ -268,12 +263,19 @@ public class MusicService extends Service
     }
 
     public void onCompletion(MediaPlayer mp) {
-        // TODO do something to get the next song?
+        this.startActivity(new Intent(this, MainActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra("completed", true));
     }
 
+    public class MusicServiceBinder extends Binder {
+        public int getCurrentPosition() {
+            return mediaPlayer != null ? mediaPlayer.getCurrentPosition() : -1;
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return this.binder;
     }
 }

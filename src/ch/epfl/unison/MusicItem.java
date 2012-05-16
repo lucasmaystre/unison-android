@@ -1,7 +1,7 @@
 package ch.epfl.unison;
 
 
-public class MusicItem {
+public class MusicItem implements Comparable<MusicItem> {
 
     public final int localId;
     public final String artist;
@@ -45,6 +45,24 @@ public class MusicItem {
         } else if (!title.equals(other.title))
             return false;
         return true;
+    }
+
+    public int compareTo(MusicItem another) {
+        int artistComp = this.artist.compareTo(another.artist);
+        if (artistComp != 0)
+            return artistComp;
+
+        int titleComp = this.title.compareTo(another.title);
+        if (titleComp != 0)
+            return titleComp;
+
+        if (this.localId < another.localId) {
+            return -1;
+        } else if (this.localId > another.localId) {
+            return 1;
+        }
+
+        return 0;
     }
 
 }
