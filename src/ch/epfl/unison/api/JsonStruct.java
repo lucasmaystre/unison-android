@@ -47,6 +47,7 @@ public abstract class JsonStruct {
         public Long rid;
         public String name;
         public Track track;
+        public Float distance;
         public User master;
         public User[] users;
         public Integer nbUsers;

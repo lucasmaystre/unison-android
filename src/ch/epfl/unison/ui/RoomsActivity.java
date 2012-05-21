@@ -24,6 +24,7 @@ import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.RoomsList;
 import ch.epfl.unison.api.JsonStruct.Success;
@@ -37,7 +38,7 @@ import com.actionbarsherlock.view.MenuItem;
 public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.RoomsActivity";
-    private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
+    private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
 
     private ListView roomsList;
     private Menu menu;
@@ -125,8 +126,9 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
 
     public void onRefresh() {
         this.repaintRefresh(true);
-        UnisonAPI api = AppData.getInstance(this).getAPI();
-        api.listRooms(new UnisonAPI.Handler<JsonStruct.RoomsList>() {
+
+        UnisonAPI.Handler<JsonStruct.RoomsList> handler
+                = new UnisonAPI.Handler<JsonStruct.RoomsList>() {
 
             public void callback(RoomsList struct) {
                 RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
@@ -137,8 +139,16 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                 Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 RoomsActivity.this.repaintRefresh(false);
             }
+        };
 
-        });
+        AppData data = AppData.getInstance(this);
+        if (data.getLocation() != null) {
+            double lat = data.getLocation().getLatitude();
+            double lon = data.getLocation().getLongitude();
+            data.getAPI().listRooms(lat, lon, handler);
+        } else {
+            data.getAPI().listRooms(handler);
+        }
     }
 
     public void repaintRefresh(boolean isRefreshing) {
@@ -169,15 +179,23 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
+            JsonStruct.Room room = this.getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) RoomsActivity.this.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.roomName)).setText(this.getItem(position).name);
-            ((TextView) view.findViewById(R.id.nbParticipants))
-                    .setText(this.getItem(position).nbUsers + " people in this room.");
-            view.setTag(this.getItem(position));
+            ((TextView) view.findViewById(R.id.roomName)).setText(room.name);
+            String subtitle = null;
+            if (room.distance != null) {
+                subtitle = String.format("%s away - %d people.",
+                        Uutils.distToString(room.distance), room.nbUsers);
+            } else {
+                subtitle = String.format("%d people.", room.nbUsers);
+            }
+            ((TextView) view.findViewById(R.id.nbParticipants)).setText(subtitle);
+
+            view.setTag(room);
             return view;
         }
     }

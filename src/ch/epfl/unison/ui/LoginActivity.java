@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.epfl.unison.AppData;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -49,6 +50,9 @@ public class LoginActivity extends SherlockActivity {
                 LoginActivity.this.login(email, password);
             }
         });
+
+        // Initialize the AppData instance.
+        AppData.getInstance(this);
     }
 
     @Override
