@@ -21,12 +21,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.MusicItem;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.TrackQueue;
@@ -54,6 +56,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     private View buttons;
     private TextView artistTxt;
     private TextView titleTxt;
+    private ImageView coverImg;
 
     private boolean isDJ;
 
@@ -101,8 +104,13 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         this.ratingBtn.setOnClickListener(new OnRatingClickListener());
 
         this.buttons = v.findViewById(R.id.musicButtons);
+        if (!this.isDJ) {
+            // Just to make sure, when the activity is recreated.
+            this.buttons.setVisibility(View.INVISIBLE);
+        }
         this.artistTxt = (TextView) v.findViewById(R.id.musicArtist);
         this.titleTxt = (TextView) v.findViewById(R.id.musicTitle);
+        this.coverImg = (ImageView) v.findViewById(R.id.musicCover);
 
         this.history = new ArrayList<MusicItem>();
         this.histPointer = 0;
@@ -155,8 +163,14 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             this.titleTxt.setText(roomInfo.track.title);
             this.currentTrack = new MusicItem(
                     -1, roomInfo.track.artist, roomInfo.track.title);
+            if (roomInfo.track.image != null) {
+                Uutils.setBitmapFromURL(this.coverImg, roomInfo.track.image);
+            } else {
+                this.coverImg.setImageResource(R.drawable.cover);
+            }
         } else {
             this.currentTrack = null;
+            this.coverImg.setImageResource(R.drawable.cover);
         }
     }
 
@@ -242,6 +256,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
 
         // Update the interface.
         this.toggleBtn.setBackgroundResource(R.drawable.btn_pause);
+        this.coverImg.setImageResource(R.drawable.cover);
         this.artistTxt.setText(item.artist);
         this.titleTxt.setText(item.title);
 
@@ -249,7 +264,12 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         UnisonAPI api = AppData.getInstance(this.activity).getAPI();
         api.setCurrentTrack(this.activity.getRoomId(), item.artist, item.title,
                 new UnisonAPI.Handler<JsonStruct.Success>() {
-            public void callback(JsonStruct.Success struct) {}
+
+            public void callback(JsonStruct.Success struct) {
+                // Automatically refresh the content (in particular, to get the cover art).
+                activity.onRefresh();
+            }
+
             public void onError(Error error) {
                 Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
             }

@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:id="@+id/musicMainLayout" >
 
-  <ch.epfl.unison.ui.AspectRatioImageView
+  <ImageView
       android:id="@+id/musicCover"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
+      android:layout_height="match_parent"
       android:src="@drawable/cover"
       android:contentDescription="album cover"
       android:scaleType="fitStart" />
@@ -17,7 +17,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:background="#7000"
+      android:background="#A000"
       android:padding="20dp">
 
 
@@ -70,10 +70,9 @@
   <RelativeLayout
       android:id="@+id/musicButtons"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignBottom="@id/musicCover"
-      android:background="#4FFF"
-      android:visibility="invisible">
+      android:layout_height="56dp"
+      android:layout_above="@id/musicActions"
+      android:background="@drawable/media_bg">
 
     <!-- Play / pause button -->
     <Button android:id="@+id/musicToggleBtn"

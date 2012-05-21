@@ -29,6 +29,7 @@ public abstract class JsonStruct {
 
         public String artist;
         public String title;
+        public String image;
         public Integer localId;
         public Integer rating;
 
