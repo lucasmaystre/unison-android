@@ -98,10 +98,12 @@ public class UnisonAPI {
                 .setAuth(this.auth).doGET();
     }
 
-    public void createRoom(String name, Handler<JsonStruct.RoomsList> handler) {
+    public void createRoom(String name, double lat, double lon,
+            Handler<JsonStruct.RoomsList> handler) {
         URL url = urlFor("/rooms");
         AsyncRequest.of(url, handler, JsonStruct.RoomsList.class)
-                .addParam("name", name).setAuth(this.auth).doPOST();
+                .addParam("name", name).addParam("lat", lat)
+                .addParam("lon", lon).setAuth(this.auth).doPOST();
     }
 
     public void getRoomInfo(long rid, Handler<JsonStruct.Room> handler) {

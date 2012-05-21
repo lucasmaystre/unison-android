@@ -18,25 +18,44 @@ public class AppData implements OnSharedPreferenceChangeListener {
 
     private static AppData instance;
 
+    private Context context;
     private UnisonAPI api;
     private SharedPreferences prefs;
+
+    private LocationManager locationMgr;
+    private String locationProvider;
+    private UnisonLocationListener locationListener;
     private Location location;
 
-    private AppData(Context c) {
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(c);
+    private AppData(Context context) {
+        this.context = context;
+        this.locationListener = new UnisonLocationListener();
+        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
         this.prefs.registerOnSharedPreferenceChangeListener(this);
+    }
 
-        LocationManager lm = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
-        String provider = LocationManager.NETWORK_PROVIDER;
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            provider = LocationManager.GPS_PROVIDER;  // Upgrade to GPS ;-)
-
-        this.location = lm.getLastKnownLocation(provider);
-        if (location != null) {
-            Log.i(TAG, String.format("Got location: lat=%f, lon=%f",
-                    this.location.getLatitude(), this.location.getLongitude()));
+    private AppData setupLocation() {
+        boolean updateListener = false;
+        if (this.locationMgr == null) {
+            this.locationMgr = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            this.locationProvider = LocationManager.NETWORK_PROVIDER;
+            updateListener = true;
         }
-        lm.requestLocationUpdates(provider, LOCATION_INTERVAL, 1f, new UnisonLocationListener());
+        if (!this.locationProvider.equals(LocationManager.GPS_PROVIDER)
+                && this.locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            // Always try to upgrade to GPS.
+            this.locationProvider = LocationManager.GPS_PROVIDER;
+            updateListener = true;
+        }
+        if (this.location == null) {
+            this.location = this.locationMgr.getLastKnownLocation(this.locationProvider);
+        }
+        if (updateListener) {
+            this.locationMgr.removeUpdates(this.locationListener);
+            this.locationMgr.requestLocationUpdates(
+                    this.locationProvider, LOCATION_INTERVAL, 1f, this.locationListener);
+        }
+        return this;
     }
 
     public UnisonAPI getAPI() {
@@ -64,7 +83,7 @@ public class AppData implements OnSharedPreferenceChangeListener {
         if (instance == null) {
             instance = new AppData(c.getApplicationContext());
         }
-        return instance;
+        return instance.setupLocation();
     }
 
     public synchronized void onSharedPreferenceChanged(

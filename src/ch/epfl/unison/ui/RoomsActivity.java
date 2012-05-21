@@ -217,8 +217,11 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String name = input.getText().toString();
 
-                    UnisonAPI api = AppData.getInstance(RoomsActivity.this).getAPI();
-                    api.createRoom(name, new UnisonAPI.Handler<JsonStruct.RoomsList>() {
+                    AppData data = AppData.getInstance(RoomsActivity.this);
+                    double lat = data.getLocation().getLatitude();
+                    double lon = data.getLocation().getLongitude();
+                    data.getAPI().createRoom(name, lat, lon,
+                            new UnisonAPI.Handler<JsonStruct.RoomsList>() {
 
                         public void callback(RoomsList struct) {
                             RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
