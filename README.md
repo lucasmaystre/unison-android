@@ -1,31 +1,31 @@
-Unison
-======
+# What's Unison?
 
-Unison is a group music recommender for parties. It picks out the best music on
-your Android device given the people around you.
+Unison is the code name behind **GroupStreamer**. It's a group music recommender
+for parties and gatherings: it picks out the best music on your Android device
+given the people around you.
 
-For more informations, [contact me][2].
+It's basically a mobile interface to the Unison back-end, which is also [hosted
+on GitHub][4].
 
-Want to test it ?
------------------
 
-You are welcome to test the app. Requirements:
+## Dependencies
 
-- The Android SDK (level > 10). If you have a Mac & [Homebrew][3], try 'brew
-  install android'
-- A [USB debugging enabled][1] android device (or you can just fire up an
-  emulator).
+The app currently depends on these external projects:
 
-Then:
+- [ActionBarSherlock][1] for an implementation of the action bar on
+  pre-Honeycomb devices.
+- The [Support Package][2] which is needed by ActionBarSherlock.
+- [Gson][3] for JSON serialization / deserialization.
 
-    git clone git://github.com/lucasmaystre/unison-android.git
-    android update project --path unison-android/
-    cd unison-android/
-    # Connect your android device to your computer
-    ant debug install
 
-That's it!
+## I want to test it!
 
-[1]: http://developer.android.com/guide/developing/device.html
-[2]: mailto:lucas@maystre.ch
-[3]: http://mxcl.github.com/homebrew/
+The app is not yet available on Google Play, although we should get there soon.
+If you want to test it in the meantime, please [contact me][5].
+
+
+[1]: http://actionbarsherlock.com/
+[2]: http://developer.android.com/sdk/compatibility-library.html
+[3]: http://code.google.com/p/google-gson/
+[4]: https://github.com/lucasmaystre/unison-recsys
+[5]: mailto:lucas@maystre.ch
