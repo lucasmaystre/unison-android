@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -72,17 +73,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         this.registerReceiver(this.logoutReceiver,
                 new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-        Bundle extras = this.getIntent().getExtras();
-        if (extras == null || !extras.containsKey("rid")) {
-            // Should never happen. If it does, redirect the user to the rooms list.
-            this.startActivity(new Intent(this, RoomsActivity.class));
-            this.finish();
-        }
-
-        this.roomId = extras.getLong("rid");
-        if (extras.containsKey("name")) {
-            this.setTitle(extras.getString("name"));
-        }
+        this.handleExtras(this.getIntent().getExtras());
 
         // Set up the tabs & stuff.
         this.viewPager = new ViewPager(this);
@@ -100,15 +91,30 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
                 StatsFragment.class, null);
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        // Used as a kind of callback.
-        super.onNewIntent(intent);
-        Bundle extras = intent.getExtras();
+    private void handleExtras(Bundle extras) {
         if (extras != null && extras.getBoolean("completed")
                 && this.musicServiceListener != null) {
+            // Music service telling us that the track has completed.
             this.musicServiceListener.onCompletion();
+        } else if (extras == null || !extras.containsKey("rid")) {
+            // Should never happen. If it does, redirect the user to the rooms list.
+            this.startActivity(new Intent(this, RoomsActivity.class));
+            this.finish();
+        } else {
+            this.roomId = extras.getLong("rid");
+            Log.i(TAG, "joined room " + this.roomId);
+            if (extras.containsKey("name")) {
+                this.setTitle(extras.getString("name"));
+            }
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // Used as a kind of callback from the music service.
+        super.onNewIntent(intent);
+        this.setIntent(intent);
+        this.handleExtras(intent.getExtras());
     }
 
     @Override

@@ -3,6 +3,7 @@ package ch.epfl.unison.ui;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
@@ -41,6 +42,14 @@ public class LoginActivity extends SherlockActivity {
 
         this.signupTxt = (TextView) findViewById(R.id.signupTxt);
         this.signupTxt.setText(Html.fromHtml("New to GroupStreamer? <a href=\"#\">Sign up</a>."));
+        this.signupTxt.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://groupstreamer.com/m/signup"));
+                startActivity(browserIntent);
+            }
+
+        });
 
         this.loginBtn = (Button) findViewById(R.id.loginBtn);
         this.loginBtn.setOnClickListener(new OnClickListener() {
@@ -73,16 +82,33 @@ public class LoginActivity extends SherlockActivity {
             // Truncate the library.
             this.startService(new Intent(LibraryService.ACTION_TRUNCATE));
 
-        } else {
-            // Try to login from the saved preferences.
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String email = prefs.getString("email", null);
-            String password = prefs.getString("password", null);
-
+        } else if (extras!= null) {
+            String email = extras.getString("email");
+            String password = extras.getString("password");
             if (email != null && password != null) {
-                this.login(email, password);
+                // Login information is in the intent.
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("email", email);
+                editor.putString("password", password);
+                editor.remove("uid");
+                editor.remove("lastupdate");
+                editor.commit();
+
+                // Truncate the library. You never know.
+                this.startService(new Intent(LibraryService.ACTION_TRUNCATE));
             }
         }
+
+        // Try to login from the saved preferences.
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String email = prefs.getString("email", null);
+        String password = prefs.getString("password", null);
+
+        if (email != null && password != null) {
+            this.login(email, password);
+        }
+
         this.fillEmailPassword();
     }
 
