@@ -1,12 +1,12 @@
-# What's Unison?
+# What's GroupStreamer?
 
-Unison is the code name behind **GroupStreamer**. It's a group music recommender
-for parties and gatherings: it picks out the best music on your Android device
-given the people around you.
+GroupStreamer is a group music recommender for parties and gatherings: it picks
+out the best music on your Android device given the people around you. It's
+basically a mobile interface to the Unison back-end, which is also [hosted on
+GitHub][4].
 
-It's basically a mobile interface to the Unison back-end, which is also [hosted
-on GitHub][4].
-
+*Note: GroupStreamer was code-named Unison, hence the many references to this
+term.*
 
 ## Dependencies
 
