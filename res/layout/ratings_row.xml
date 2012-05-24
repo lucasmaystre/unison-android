@@ -9,42 +9,41 @@
     android:paddingRight="10dp"
     android:paddingBottom="10dp">
 
-    <LinearLayout
+  <LinearLayout
+      android:layout_height="wrap_content"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:orientation="vertical">
+
+    <TextView
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-      <TextView
-          android:layout_height="wrap_content"
-          android:layout_width="wrap_content"
-          android:textAppearance="?android:attr/textAppearanceSmall"
-          android:singleLine="true"
-          android:ellipsize="end"
-          android:text="Milow"
-          android:id="@+id/artistMusicList" />
-
-      <TextView
-          android:layout_height="wrap_content"
-          android:layout_width="wrap_content"
-          android:textAppearance="?android:attr/textAppearanceMedium"
-          android:ellipsize="end"
-          android:singleLine="true"
-          android:text="Ayo Technology"
-          android:id="@+id/textMusicList" />
-    </LinearLayout>
-
-
-
-    <RatingBar
-        android:isIndicator="true"
-        style="?android:attr/ratingBarStyleSmall"
-        android:numStars="5"
-        android:rating="3.0"
-        android:stepSize="1.0"
-        android:id="@+id/ratingBarMusicList"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:text="Milow"
+        android:id="@+id/artistMusicList" />
 
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Ayo Technology"
+        android:id="@+id/textMusicList" />
+  </LinearLayout>
+
+
+
+  <RatingBar
+      android:isIndicator="true"
+      style="?android:attr/ratingBarStyleSmall"
+      android:numStars="5"
+      android:rating="3.0"
+      android:stepSize="1.0"
+      android:id="@+id/ratingBarMusicList"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -22,5 +22,10 @@
     <string name="pref_title_uuid">UUID</string>
     <string name="pref_summary_uuid">A number that uniquely identifies you.</string>
 
+    <!-- Statistics -->
+    <string name="rating_predicted">predicted from musical profile</string>
+    <string name="rating_true">explicit user rating</string>
+    <string name="rating_unknown">not yet computed</string>
+
     <!-- Layouts. -->
 </resources>

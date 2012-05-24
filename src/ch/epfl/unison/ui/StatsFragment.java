@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -74,7 +74,17 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnRo
             }
             ((TextView) view.findViewById(R.id.username)).setText(this.getItem(position).nickname);
             int score = getItem(position).score != null ? getItem(position).score : 0;
-            ((ProgressBar) view.findViewById(R.id.liking)).setProgress(score);
+            float rating = Math.round(score / 10.0) / 2f;
+            ((RatingBar) view.findViewById(R.id.liking)).setRating(rating);
+
+            TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);
+            if (getItem(position).score == null || getItem(position).predicted == null) {
+                explanation.setText(R.string.rating_unknown);
+            } else if (getItem(position).predicted) {
+                explanation.setText(R.string.rating_predicted);
+            } else {
+                explanation.setText(R.string.rating_true);
+            }
 
             return view;
         }
