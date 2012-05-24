@@ -57,7 +57,6 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     };
 
     private Set<OnRoomInfoListener> listeners = new HashSet<OnRoomInfoListener>();
-    private MusicServiceListener musicServiceListener;
 
     private long roomId;
 
@@ -68,12 +67,11 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.handleExtras(this.getIntent().getExtras());
 
         // This activity should finish on logout.
         this.registerReceiver(this.logoutReceiver,
                 new IntentFilter(UnisonMenu.ACTION_LOGOUT));
-
-        this.handleExtras(this.getIntent().getExtras());
 
         // Set up the tabs & stuff.
         this.viewPager = new ViewPager(this);
@@ -92,11 +90,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     }
 
     private void handleExtras(Bundle extras) {
-        if (extras != null && extras.getBoolean("completed")
-                && this.musicServiceListener != null) {
-            // Music service telling us that the track has completed.
-            this.musicServiceListener.onCompletion();
-        } else if (extras == null || !extras.containsKey("rid")) {
+        if (extras == null || !extras.containsKey("rid")) {
             // Should never happen. If it does, redirect the user to the rooms list.
             this.startActivity(new Intent(this, RoomsActivity.class));
             this.finish();
@@ -107,14 +101,6 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
                 this.setTitle(extras.getString("name"));
             }
         }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        // Used as a kind of callback from the music service.
-        super.onNewIntent(intent);
-        this.setIntent(intent);
-        this.handleExtras(intent.getExtras());
     }
 
     @Override
@@ -204,14 +190,6 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
 
     public static interface OnRoomInfoListener {
         public void onRoomInfo(JsonStruct.Room roomInfo);
-    }
-
-    public void setMusicServiceListener(MusicServiceListener listener) {
-        this.musicServiceListener = listener;
-    }
-
-    public static interface MusicServiceListener {
-        public void onCompletion();
     }
 
 

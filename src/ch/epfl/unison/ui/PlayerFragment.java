@@ -5,11 +5,13 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,9 +42,9 @@ import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 import com.actionbarsherlock.app.SherlockFragment;
 
 public class PlayerFragment extends SherlockFragment implements OnClickListener,
-        MainActivity.OnRoomInfoListener, MainActivity.MusicServiceListener {
+        MainActivity.OnRoomInfoListener {
 
-    private static final String TAG = "MusicPlayerActivity";
+    private static final String TAG = "ch.epfl.unison.PlayerFragment";
     private static final int CLICK_INTERVAL = 5 * 1000;  // In milliseconds.
 
     private MainActivity activity;
@@ -73,6 +75,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     }
     Status status = Status.Stopped;
 
+    private BroadcastReceiver completedReceiver = new TrackCompletedReceiver();
     private MusicServiceBinder musicService;
     private boolean isBound;
     private ServiceConnection connection = new ServiceConnection() {
@@ -104,10 +107,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         this.ratingBtn.setOnClickListener(new OnRatingClickListener());
 
         this.buttons = v.findViewById(R.id.musicButtons);
-        if (!this.isDJ) {
-            // Just to make sure, when the activity is recreated.
-            this.buttons.setVisibility(View.INVISIBLE);
-        }
+
         this.artistTxt = (TextView) v.findViewById(R.id.musicArtist);
         this.titleTxt = (TextView) v.findViewById(R.id.musicTitle);
         this.coverImg = (ImageView) v.findViewById(R.id.musicCover);
@@ -123,19 +123,25 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         super.onAttach(activity);
         this.activity = (MainActivity) activity;
         this.activity.registerRoomInfoListener(this);
-        this.activity.setMusicServiceListener(this);
+        this.activity.registerReceiver(this.completedReceiver,
+                new IntentFilter(MusicService.ACTION_COMPLETED));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         this.activity.unregisterRoomInfoListener(this);
-        this.activity.setMusicServiceListener(null);
+        this.activity.unregisterReceiver(this.completedReceiver);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        if (!this.isDJ) {
+            // Just to make sure, when the activity is recreated.
+            this.buttons.setVisibility(View.INVISIBLE);
+            this.djBtn.setText("Become the DJ");
+        }
         this.activity.bindService(new Intent(this.activity, MusicService.class),
                 this.connection, Context.BIND_AUTO_CREATE);
     }
@@ -146,6 +152,12 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         if (this.isBound) {
             this.activity.unbindService(this.connection);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().startService(new Intent(MusicService.ACTION_STOP));
     }
 
     public void onRoomInfo(JsonStruct.Room roomInfo) {
@@ -189,12 +201,6 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             Log.d(TAG, "Clicked DJ button");
             this.setDJ(!this.isDJ);
         }
-    }
-
-
-    public void onCompletion() {
-        this.status = Status.Stopped;
-        this.next();
     }
 
     private void prev() {
@@ -248,6 +254,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     }
 
     private void play(MusicItem item) {
+        Log.i(TAG, String.format("playing %s - %s", item.artist, item.title));
         // Send the song to the music player service.
         Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.localId);
         this.activity.startService(new Intent(MusicService.ACTION_LOAD).setData(uri));
@@ -367,5 +374,16 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             alert.setNegativeButton("Cancel", null);
             alert.show();
         }
+    }
+
+    private class TrackCompletedReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PlayerFragment.this.status = Status.Stopped;
+            Log.i(TAG, "track has completed, send the next one.");
+            PlayerFragment.this.next();
+        }
+
     }
 }

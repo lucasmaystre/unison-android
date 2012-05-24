@@ -41,7 +41,6 @@
     </activity>
 
     <activity android:name=".ui.MainActivity"
-        android:launchMode="singleTask"
         android:screenOrientation="portrait"
         android:label="@string/activity_title_main" />
 

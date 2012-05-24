@@ -33,11 +33,15 @@ public class MusicService extends Service
     private static final int NOTIFICATION_ID = 1;
     private static final float DUCK_VOLUME = 0.1f;
 
+    // Actions used on the service.
     public static final String ACTION_PLAY = "ch.epfl.unison.music.action.PLAY";
     public static final String ACTION_PAUSE = "ch.epfl.unison.music.action.PAUSE";
     public static final String ACTION_STOP = "ch.epfl.unison.music.action.STOP";
     public static final String ACTION_TOGGLE_PLAYBACK = "ch.epfl.unison.music.action.TOGGLE_PLAYBACK";
     public static final String ACTION_LOAD = "ch.epfl.unison.music.action.LOAD";
+
+    // Actions broadcasted.
+    public static final String ACTION_COMPLETED = "ch.epfl.unison.music.action.COMPLETED";
 
     private AudioFocusHelper focusHelper;
     private MediaPlayer mediaPlayer;
@@ -263,9 +267,8 @@ public class MusicService extends Service
     }
 
     public void onCompletion(MediaPlayer mp) {
-        this.startActivity(new Intent(this, MainActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("completed", true));
+        Log.i(TAG, "track completed - sending broadcast message");
+        this.sendBroadcast(new Intent().setAction(ACTION_COMPLETED));
     }
 
     public class MusicServiceBinder extends Binder {
