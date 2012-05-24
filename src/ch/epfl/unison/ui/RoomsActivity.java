@@ -40,6 +40,8 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
     private static final String TAG = "ch.epfl.unison.RoomsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
 
+    public static final String ACTION_LEAVE_ROOM = "ch.epfl.unison.action.LEAVE_ROOM";
+
     private ListView roomsList;
     private Menu menu;
 
@@ -77,6 +79,10 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
 
         this.roomsList = (ListView)this.findViewById(R.id.roomsList);
         this.roomsList.setOnItemClickListener(new OnRoomSelectedListener());
+
+        if (ACTION_LEAVE_ROOM.equals(this.getIntent().getAction())) {
+            this.leaveRoom();
+        }
     }
 
     @Override
@@ -84,21 +90,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         super.onResume();
         this.isForeground = true;
         this.startService(new Intent(LibraryService.ACTION_UPDATE));
-
-        // Make sure the user is not marked as present in any room.
-        AppData data = AppData.getInstance(this);
-        data.getAPI().leaveRoom(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
-
-            public void callback(Success struct) {
-                Log.d(TAG, "successfully left room");
-                handler.post(updater);
-            }
-
-            public void onError(Error error) {
-                Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-                handler.post(updater);
-            }
-        });
+        this.handler.post(this.updater);
     }
 
     @Override
@@ -167,6 +159,21 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                 refreshItem.setActionView(null);
             }
         }
+    }
+
+    private void leaveRoom() {
+        // Make sure the user is not marked as present in any room.
+        AppData data = AppData.getInstance(this);
+        data.getAPI().leaveRoom(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+
+            public void callback(Success struct) {
+                Log.d(TAG, "successfully left room");
+            }
+
+            public void onError(Error error) {
+                Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private class RoomsAdapter extends ArrayAdapter<JsonStruct.Room> {
