@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
   <EditTextPreference
-      android:title="@string/pref_title_username"
-      android:key="username"
-      android:summary="@string/pref_summary_username"/>
-  <EditTextPreference
-      android:title="@string/pref_title_uuid"
-      android:key="uuid"
-      android:summary="@string/pref_title_uuid"
+      android:title="@string/pref_title_nickname"
+      android:key="nickname"
+      android:summary="@string/pref_summary_nickname"/>
+  <Preference
+      android:title="@string/pref_title_uid"
+      android:key="uid"
+      android:summary="@string/pref_title_uid"
       android:enabled="false"/>
 </PreferenceScreen>
