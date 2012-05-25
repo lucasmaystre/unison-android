@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Cloud Nothings"
+        android:text="unknown"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <!-- Title -->
@@ -35,10 +35,9 @@
         android:id="@+id/musicTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="No track playing"
         android:gravity="center"
-        android:layout_below="@id/musicArtist"
         android:textStyle="bold"
-        android:text="Wasted Days"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
   </LinearLayout>
