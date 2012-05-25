@@ -36,6 +36,7 @@ public class LibraryService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "starting the library service");
         String action = intent.getAction();
         if (action.equals(ACTION_UPDATE)) {
             this.update();
@@ -46,6 +47,7 @@ public class LibraryService extends Service {
     }
 
     private void truncate() {
+        Log.d(TAG, "truncating the user library");
         LibraryHelper helper = new LibraryHelper(this);
         helper.truncate();
         helper.close();
@@ -54,7 +56,7 @@ public class LibraryService extends Service {
     private void update() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // How many seconds elapsed since the last successful update ?
-        int interval = ((int) System.currentTimeMillis() / 1000) - prefs.getInt("lastupdate", -1);
+        long interval = (System.currentTimeMillis() / 1000l) - prefs.getLong("lastupdate", -1);
 
         if (!this.isUpdating && interval > MIN_UPDATE_INTERVAL) {
             this.isUpdating = true;
@@ -67,6 +69,8 @@ public class LibraryService extends Service {
                 Log.d(TAG, "updating the library");
                 new Updater().execute();
             }
+        } else {
+            Log.d(TAG, String.format("didn't update the library (interval: %d)", interval));
         }
     }
 
@@ -79,7 +83,7 @@ public class LibraryService extends Service {
             if (isSuccessful) {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LibraryService.this);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("lastupdate", (int) System.currentTimeMillis() / 1000);
+                editor.putLong("lastupdate", System.currentTimeMillis() / 1000l);
                 editor.commit();
             }
         }
