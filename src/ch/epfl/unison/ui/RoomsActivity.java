@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -80,8 +81,12 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         this.roomsList = (ListView)this.findViewById(R.id.roomsList);
         this.roomsList.setOnItemClickListener(new OnRoomSelectedListener());
 
+        // Actions that should be taken whe activity is started.
         if (ACTION_LEAVE_ROOM.equals(this.getIntent().getAction())) {
+            // We are coming back from a room - let's make sure the back-end knows.
             this.leaveRoom();
+        } else if (AppData.getInstance(this).showHelpDialog()) {
+            this.showHelpDialog();
         }
     }
 
@@ -174,6 +179,34 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                 Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void showHelpDialog() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Welcome");
+        alert.setMessage("Want to learn how to use the application ?");
+
+        final CheckBox cbox = new CheckBox(this);
+        cbox.setText("Don't show this again");
+        alert.setView(cbox);
+
+        DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                if (cbox.isChecked()) {
+                    // Don't show the dialog again in the future.
+                    AppData.getInstance(RoomsActivity.this).setShowHelpDialog(false);
+                }
+                if (DialogInterface.BUTTON_POSITIVE == which) {
+                    startActivity(new Intent(RoomsActivity.this, HelpActivity.class));
+                }
+            }
+        };
+
+        alert.setPositiveButton("Yes", click);
+        alert.setNegativeButton("No, thanks", click);
+        alert.show();
     }
 
     private class RoomsAdapter extends ArrayAdapter<JsonStruct.Room> {

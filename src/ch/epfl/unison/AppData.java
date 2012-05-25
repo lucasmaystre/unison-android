@@ -75,6 +75,14 @@ public class AppData implements OnSharedPreferenceChangeListener {
         return this.prefs.getLong("uid", -1);
     }
 
+    public boolean showHelpDialog() {
+        return this.prefs.getBoolean("helpdialog", true);
+    }
+
+    public void setShowHelpDialog(boolean value) {
+        this.prefs.edit().putBoolean("helpdialog", value).commit();
+    }
+
     public Location getLocation() {
         return this.location;
     }

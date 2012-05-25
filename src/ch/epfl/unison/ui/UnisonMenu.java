@@ -34,13 +34,16 @@ public abstract class UnisonMenu {
     public static boolean onOptionsItemSelected(Activity activity, OnRefreshListener listener, MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_item_refresh:
-            listener.onRefresh();
+            if (listener != null) { listener.onRefresh(); }
         break;
         case R.id.menu_item_ratings:
             activity.startActivity(new Intent(activity, RatingsActivity.class));
         break;
         case R.id.menu_item_prefs:
             activity.startActivity(new Intent(activity, PrefsActivity.class));
+        break;
+        case R.id.menu_item_help:
+            activity.startActivity(new Intent(activity, HelpActivity.class));
         break;
         case R.id.menu_item_logout:
             activity.startActivity(new Intent(activity, LoginActivity.class)
