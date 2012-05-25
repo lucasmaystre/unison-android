@@ -16,10 +16,10 @@
 
   <item android:id="@+id/menu_item_help"
       android:title="@string/activity_title_help"
-      android:icon="@drawable/ic_menu_preferences" />
+      android:icon="@drawable/ic_menu_help" />
 
   <item android:id="@+id/menu_item_logout"
       android:title="@string/menu_title_logout"
-      android:icon="@drawable/ic_menu_preferences" />
+      android:icon="@drawable/ic_menu_logout" />
 
 </menu>
