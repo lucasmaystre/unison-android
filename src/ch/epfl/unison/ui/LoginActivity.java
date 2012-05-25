@@ -3,10 +3,10 @@ package ch.epfl.unison.ui;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -44,9 +44,7 @@ public class LoginActivity extends SherlockActivity {
         this.signupTxt.setText(Html.fromHtml("New to GroupStreamer? <a href=\"#\">Sign up</a>."));
         this.signupTxt.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://groupstreamer.com/m/signup"));
-                startActivity(browserIntent);
+                startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             }
 
         });
@@ -70,6 +68,7 @@ public class LoginActivity extends SherlockActivity {
 
         Bundle extras = this.getIntent().getExtras();
         if (extras != null && extras.getBoolean("logout")) {
+            Log.d(TAG, "logging out");
             // Remove e-mail and password from the preferences.
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = prefs.edit();
@@ -82,7 +81,8 @@ public class LoginActivity extends SherlockActivity {
             // Truncate the library.
             this.startService(new Intent(LibraryService.ACTION_TRUNCATE));
 
-        } else if (extras!= null) {
+        } else if (extras != null) {
+            // We're coming from the signup form (whether native or online).
             String email = extras.getString("email");
             String password = extras.getString("password");
             if (email != null && password != null) {
@@ -138,6 +138,8 @@ public class LoginActivity extends SherlockActivity {
             // Display list of rooms.
             this.startActivity(new Intent(this, RoomsActivity.class));
         }
+        // Close this activity.
+        this.finish();
     }
 
     private void login(final String email, final String password) {
