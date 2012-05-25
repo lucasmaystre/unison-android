@@ -73,7 +73,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                 new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         this.setContentView(R.layout.rooms);
-        this.setTitle(R.string.activity_title_rooms);
+        //this.setTitle(R.string.activity_title_rooms);
 
         ((Button)this.findViewById(R.id.createRoomBtn))
                 .setOnClickListener(new OnCreateRoomListener());

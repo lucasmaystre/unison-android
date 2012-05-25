@@ -5,48 +5,48 @@
     android:orientation="vertical"
     android:gravity="center" >
 
-    <ImageView
-        android:id="@+id/splash"
-        android:src="@drawable/splash"
-        android:contentDescription="@string/app_name"
-        android:layout_height="154dp"
-        android:layout_width="192dp"
-        android:scaleType="centerInside"
-        android:layout_marginBottom="20dp"/>
+  <ImageView
+      android:id="@+id/splash"
+      android:src="@drawable/splash"
+      android:contentDescription="@string/app_name"
+      android:layout_height="154dp"
+      android:layout_width="192dp"
+      android:scaleType="centerInside"
+      android:layout_marginBottom="20dp"/>
 
-    <EditText
-        android:id="@+id/email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:hint="E-mail address"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp" >
-    </EditText>
+  <EditText
+      android:id="@+id/email"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:inputType="textEmailAddress"
+      android:hint="E-mail address"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="40dp" >
+  </EditText>
 
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:hint="Password" />
+  <EditText
+      android:id="@+id/password"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:inputType="textPassword"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="40dp"
+      android:hint="Password" />
 
-    <Button
-        android:id="@+id/loginBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:text="Log In" />
+  <Button
+      android:id="@+id/loginBtn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="40dp"
+      android:text="Log In" />
 
-    <TextView
-        android:id="@+id/signupTxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:text="New to GroupStreamer ?" />
+  <TextView
+      android:id="@+id/signupTxt"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="80dp"
+      android:text="New to GroupStreamer ?" />
 
 </LinearLayout>
