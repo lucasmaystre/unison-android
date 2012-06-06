@@ -112,9 +112,9 @@ public class UnisonAPI {
                 .setAuth(this.auth).doGET();
     }
 
-    public void getNextTrack(long rid, Handler<JsonStruct.Track> handler) {
+    public void getNextTrack(long rid, Handler<JsonStruct.TracksList> handler) {
         URL url = urlFor("/rooms/%d", rid);
-        AsyncRequest.of(url, handler, JsonStruct.Track.class)
+        AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
                 .setAuth(this.auth).doPOST();
     }
 
@@ -174,9 +174,9 @@ public class UnisonAPI {
         return request.doPOST();
     }
 
-    public void getRatings(long uid, Handler<JsonStruct.RatingsList> handler) {
+    public void getRatings(long uid, Handler<JsonStruct.TracksList> handler) {
         URL url = urlFor("/libentries/%d/ratings", uid);
-        AsyncRequest.of(url, handler, JsonStruct.RatingsList.class)
+        AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
                 .setAuth(this.auth).doGET();
     }
 

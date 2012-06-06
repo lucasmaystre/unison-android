@@ -1,22 +1,20 @@
 package ch.epfl.unison.api;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.MusicItem;
-import ch.epfl.unison.api.JsonStruct.Track;
-import ch.epfl.unison.api.UnisonAPI.Error;
 
 public class TrackQueue {
 
     private static final String TAG = "ch.epfl.unison.TrackQueue";
 
-    private static final int QUEUE_SIZE = 1;
     private static final int SLEEP_INTERVAL = 2000; // in ms.
 
     /** Number of attempts to get an element from the queue **/
@@ -25,15 +23,18 @@ public class TrackQueue {
     /** Max number of requests to get a track from the server */
     private static final int MAX_REQUESTS = 10;
 
-    private List<MusicItem> queue;
-    private int pending;
+    private Set<MusicItem> playlist;  // Is a set, but insertion order is important!
+    private int nextPtr;
+    private boolean isPending;
 
     private Context context;
     private long roomId;
 
     public TrackQueue(Context context, long rid) {
-        this.queue = Collections.synchronizedList(new ArrayList<MusicItem>());
-        this.pending = 0;
+        // LinkedHashSet returns insert-order iterators.
+        this.playlist = Collections.synchronizedSet(
+                new LinkedHashSet<MusicItem>());
+        this.isPending = false;
         this.context = context;
         this.roomId = rid;
     }
@@ -46,70 +47,68 @@ public class TrackQueue {
 
     public void get(final Callback clbk) {
         this.ensureEnoughElements();
-        try {
-            MusicItem item = this.queue.remove(0);
-            this.requestTrack();
-            clbk.callback(item);
-        } catch(IndexOutOfBoundsException e) {
-            new AsyncTask<Void, Void, MusicItem>() {
+        new AsyncTask<Void, Void, MusicItem>() {
 
-                @Override
-                protected MusicItem doInBackground(Void... nothing) {
-                    for (int i = 0; i < MAX_RETRIES; ++i) {
-                        try {
-                            return TrackQueue.this.queue.remove(0);
-                        } catch (IndexOutOfBoundsException e) {}
-                        try {
-                            Thread.sleep(SLEEP_INTERVAL);
-                        } catch (InterruptedException e) {}
-                    }
-                    // We declare defeat.
-                    return null;
+            @Override
+            protected MusicItem doInBackground(Void... nothing) {
+                for (int i = 0; i < MAX_RETRIES; ++i) {
+                    try {
+                        MusicItem next = new LinkedList<MusicItem>(playlist).get(nextPtr);
+                        nextPtr += 1;
+                        return next;
+                    } catch (IndexOutOfBoundsException e) {}
+                    try {
+                        Thread.sleep(SLEEP_INTERVAL);
+                    } catch (InterruptedException e) {}
                 }
+                // We declare defeat.
+                return null;
+            }
 
-                @Override
-                protected void onPostExecute(MusicItem item) {
-                    if (item != null) {
-                        TrackQueue.this.requestTrack();
-                        clbk.callback(item);
-                    } else {
-                        clbk.onError();
-                    }
+            @Override
+            protected void onPostExecute(MusicItem item) {
+                if (item != null) {
+                    ensureEnoughElements();
+                    clbk.callback(item);
+                } else {
+                    clbk.onError();
                 }
-            }.execute();
-        }
+            }
+        }.execute();
     }
 
     private synchronized void ensureEnoughElements() {
-        int nbMissing = QUEUE_SIZE - (this.queue.size() + this.pending);
-        for (int i = 0; i < nbMissing; ++i) {
-            this.requestTrack();
+        if (!this.isPending && this.playlist.size() - this.nextPtr < 1) {
+            this.requestTracks();
         }
     }
 
-    private void requestTrack() {
-        this.requestTrack(MAX_REQUESTS);
+    private void requestTracks() {
+        this.requestTracks(MAX_REQUESTS);
     }
 
-    private void requestTrack(final int trials) {
+    private void requestTracks(final int trials) {
         if (trials == 0) {
+            this.isPending = false;
             return;
         }
 
         UnisonAPI api = AppData.getInstance(this.context).getAPI();
-        this.pending += 1;
-        api.getNextTrack(this.roomId, new UnisonAPI.Handler<JsonStruct.Track>() {
+        this.isPending = true;
+        api.getNextTrack(this.roomId, new UnisonAPI.Handler<JsonStruct.TracksList>() {
 
-            public void callback(Track track) {
-                TrackQueue.this.pending -= 1;
-                TrackQueue.this.queue.add(
-                        new MusicItem(track.localId, track.artist, track.title));
+            public void callback(JsonStruct.TracksList chunk) {
+                isPending = false;
+                if (chunk.tracks != null) {
+                    for (JsonStruct.Track track : chunk.tracks) {
+                        playlist.add(new MusicItem(track.localId, track.artist, track.title));
+                    }
+                }
             }
 
-            public void onError(Error error) {
+            public void onError(UnisonAPI.Error error) {
                 Log.d(TAG, error.toString());
-                TrackQueue.this.pending -= 1;
-                TrackQueue.this.requestTrack(trials - 1);
+                requestTracks(trials - 1);
             }
         });
     }

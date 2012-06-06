@@ -42,6 +42,11 @@ public abstract class JsonStruct {
         }
     }
 
+    public static class TracksList extends JsonStruct {
+
+        public Track[] tracks;
+    }
+
     public static class Room extends JsonStruct {
 
         public Long rid;
@@ -56,11 +61,6 @@ public abstract class JsonStruct {
     public static class RoomsList extends JsonStruct {
 
         public Room[] rooms;
-    }
-
-    public static class RatingsList extends JsonStruct {
-
-        public Track[] ratings;
     }
 
     public static class Delta extends JsonStruct {

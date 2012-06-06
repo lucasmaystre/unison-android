@@ -31,7 +31,6 @@ import ch.epfl.unison.LibraryHelper;
 import ch.epfl.unison.MusicItem;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.JsonStruct.RatingsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
@@ -95,11 +94,11 @@ public class RatingsActivity extends SherlockActivity {
 
     private void initRatings(final Runnable clbk) {
         AppData data = AppData.getInstance(this);
-        data.getAPI().getRatings(data.getUid(), new UnisonAPI.Handler<JsonStruct.RatingsList>() {
+        data.getAPI().getRatings(data.getUid(), new UnisonAPI.Handler<JsonStruct.TracksList>() {
 
-            public void callback(RatingsList struct) {
+            public void callback(JsonStruct.TracksList struct) {
                 ratings = new HashMap<String, Integer>();
-                for (JsonStruct.Track t : struct.ratings) {
+                for (JsonStruct.Track t : struct.tracks) {
                     ratings.put(t.artist + t.title, t.rating);
                 }
                 clbk.run();
