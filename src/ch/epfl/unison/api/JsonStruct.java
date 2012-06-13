@@ -44,6 +44,7 @@ public abstract class JsonStruct {
 
     public static class TracksList extends JsonStruct {
 
+        public String playlistId;
         public Track[] tracks;
     }
 

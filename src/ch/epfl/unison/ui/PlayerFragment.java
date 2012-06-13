@@ -305,7 +305,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                     toggleBtn.setBackgroundResource(R.drawable.btn_play);
                     buttons.setVisibility(View.VISIBLE);
 
-                    trackQueue = new TrackQueue(getActivity(), rid).init();
+                    trackQueue = new TrackQueue(getActivity(), rid).start();
                 }
 
                 public void onError(Error error) {
@@ -315,6 +315,9 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             });
 
         } else {
+            if (this.trackQueue != null) {
+                this.trackQueue.stop();
+            }
             data.getAPI().resignMaster(rid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success structure) {

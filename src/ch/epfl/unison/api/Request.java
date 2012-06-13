@@ -33,7 +33,6 @@ public class Request<T extends JsonStruct> {
     private URL url;
     private Class<T> classOfT;
 
-    private String method;
     private String auth;
     private Map<String, List<String>> data;
 
@@ -68,32 +67,28 @@ public class Request<T extends JsonStruct> {
     }
 
     public Result<T> doGET() {
-        this.method = "GET";
-        return this.execute();
+        return this.execute("GET");
     }
 
     public Result<T> doPOST() {
-        this.method = "POST";
-        return this.execute();
+        return this.execute("POST");
     }
 
     public Result<T> doPUT() {
-        this.method = "PUT";
-        return this.execute();
+        return this.execute("PUT");
     }
 
     public Result<T> doDELETE() {
-        this.method = "DELETE";
-        return this.execute();
+        return this.execute("DELETE");
     }
 
-    private Result<T> execute() {
+    private Result<T> execute(String method) {
         HttpURLConnection conn = null;
         String response = null;
 
         try {
             conn = (HttpURLConnection) this.url.openConnection();
-            conn.setRequestMethod(this.method);
+            conn.setRequestMethod(method);
 
             // Configure some sensible defaults.
             conn.setConnectTimeout(CONNECT_TIMEOUT);
@@ -184,14 +179,17 @@ public class Request<T extends JsonStruct> {
         public final UnisonAPI.Error error;
         public final S result;
 
-        public Result(S result) {
+        private Result(S result, UnisonAPI.Error error) {
             this.result = result;
-            this.error = null;
+            this.error = error;
+        }
+
+        public Result(S result) {
+            this(result, null);
         }
 
         public Result(UnisonAPI.Error error) {
-            this.result = null;
-            this.error = error;
+            this(null, error);
         }
     }
 

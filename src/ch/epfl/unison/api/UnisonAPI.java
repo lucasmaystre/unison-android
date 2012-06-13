@@ -112,10 +112,16 @@ public class UnisonAPI {
                 .setAuth(this.auth).doGET();
     }
 
-    public void getNextTrack(long rid, Handler<JsonStruct.TracksList> handler) {
-        URL url = urlFor("/rooms/%d", rid);
+    public void getNextTracks(long rid, Handler<JsonStruct.TracksList> handler) {
+        URL url = urlFor("/rooms/%d/tracks", rid);
         AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
-                .setAuth(this.auth).doPOST();
+                .setAuth(this.auth).doGET();
+    }
+
+    public void getPlaylistId(long rid, final Handler<JsonStruct.TracksList> handler) {
+        URL url = urlFor("/rooms/%d/playlist", rid);
+        AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
+                .setAuth(this.auth).doGET();
     }
 
     public void setCurrentTrack(long rid, String artist, String title,
@@ -196,7 +202,7 @@ public class UnisonAPI {
         }
     }
 
-    public static interface Handler<S extends JsonStruct> {
+    public static interface Handler<S> {
         public void callback(S struct);
         public void onError(UnisonAPI.Error error);
     }
