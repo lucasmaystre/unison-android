@@ -40,6 +40,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
 
     private static final String TAG = "ch.epfl.unison.RoomsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
+    private static final int INITIAL_DELAY = 500; // in ms.
 
     public static final String ACTION_LEAVE_ROOM = "ch.epfl.unison.action.LEAVE_ROOM";
 
@@ -95,7 +96,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         super.onResume();
         this.isForeground = true;
         this.startService(new Intent(LibraryService.ACTION_UPDATE));
-        this.handler.post(this.updater);
+        this.handler.postDelayed(this.updater, INITIAL_DELAY);
     }
 
     @Override
@@ -150,6 +151,7 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
 
     public void repaintRefresh(boolean isRefreshing) {
         if (this.menu == null) {
+            Log.d(TAG, "repaintRefresh: this.menu is null");
             return;
         }
 
@@ -163,6 +165,8 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
             } else {
                 refreshItem.setActionView(null);
             }
+        } else {
+            Log.d(TAG, "repaintRefresh: menu_item_refresh not found");
         }
     }
 

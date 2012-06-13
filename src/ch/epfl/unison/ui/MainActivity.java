@@ -33,6 +33,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
 
     private static final String TAG = "ch.epfl.unison.MainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
+    private static final int INITIAL_DELAY = 500; // in ms.
 
     private TabsAdapter tabsAdapter;
     private ViewPager viewPager;
@@ -107,7 +108,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     protected void onResume() {
         super.onResume();
         this.isForeground = true;
-        this.handler.post(updater);
+        this.handler.postDelayed(updater, INITIAL_DELAY);
     }
 
     @Override
