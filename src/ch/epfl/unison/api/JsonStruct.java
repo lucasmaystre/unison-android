@@ -20,7 +20,7 @@ public abstract class JsonStruct {
         public String nickname;
         public String email;
         public String password;
-        public Long rid;
+        public Long gid;
         public Integer score;
         public Boolean predicted;  // or isPredicted?
     }
@@ -48,9 +48,9 @@ public abstract class JsonStruct {
         public Track[] tracks;
     }
 
-    public static class Room extends JsonStruct {
+    public static class Group extends JsonStruct {
 
-        public Long rid;
+        public Long gid;
         public String name;
         public Track track;
         public Float distance;
@@ -59,9 +59,9 @@ public abstract class JsonStruct {
         public Integer nbUsers;
     }
 
-    public static class RoomsList extends JsonStruct {
+    public static class GroupsList extends JsonStruct {
 
-        public Room[] rooms;
+        public Group[] groups;
     }
 
     public static class Delta extends JsonStruct {

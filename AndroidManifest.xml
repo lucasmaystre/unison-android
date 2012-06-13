@@ -25,8 +25,8 @@
     <activity android:name=".ui.HelpActivity"
         android:label="@string/activity_title_help" />
 
-    <activity android:name=".ui.RoomsActivity"
-        android:label="@string/activity_title_rooms" />
+    <activity android:name=".ui.GroupsActivity"
+        android:label="@string/activity_title_groups" />
 
     <activity android:name=".ui.LoginActivity"
         android:screenOrientation="portrait"

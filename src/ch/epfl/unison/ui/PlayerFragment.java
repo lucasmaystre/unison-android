@@ -42,7 +42,7 @@ import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 import com.actionbarsherlock.app.SherlockFragment;
 
 public class PlayerFragment extends SherlockFragment implements OnClickListener,
-        MainActivity.OnRoomInfoListener {
+        MainActivity.OnGroupInfoListener {
 
     private static final String TAG = "ch.epfl.unison.PlayerFragment";
     private static final int CLICK_INTERVAL = 5 * 1000;  // In milliseconds.
@@ -122,7 +122,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = (MainActivity) activity;
-        this.activity.registerRoomInfoListener(this);
+        this.activity.registerGroupInfoListener(this);
         this.activity.registerReceiver(this.completedReceiver,
                 new IntentFilter(MusicService.ACTION_COMPLETED));
     }
@@ -130,7 +130,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     @Override
     public void onDetach() {
         super.onDetach();
-        this.activity.unregisterRoomInfoListener(this);
+        this.activity.unregisterGroupInfoListener(this);
         this.activity.unregisterReceiver(this.completedReceiver);
     }
 
@@ -160,23 +160,23 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         getActivity().startService(new Intent(MusicService.ACTION_STOP));
     }
 
-    public void onRoomInfo(JsonStruct.Room roomInfo) {
+    public void onGroupInfo(JsonStruct.Group groupInfo) {
         // Check that we're consistent with respect to the DJ position.
         Long uid = AppData.getInstance(this.activity).getUid();
-        if (!this.isDJ && roomInfo.master != null && uid.equals(roomInfo.master.uid)) {
+        if (!this.isDJ && groupInfo.master != null && uid.equals(groupInfo.master.uid)) {
             this.setDJ(true);
-        } else if (this.isDJ && (roomInfo.master == null || !uid.equals(roomInfo.master.uid))) {
+        } else if (this.isDJ && (groupInfo.master == null || !uid.equals(groupInfo.master.uid))) {
             this.setDJ(false);
         }
 
         // Update track information.
-        if (roomInfo.track != null) {
-            this.artistTxt.setText(roomInfo.track.artist);
-            this.titleTxt.setText(roomInfo.track.title);
+        if (groupInfo.track != null) {
+            this.artistTxt.setText(groupInfo.track.artist);
+            this.titleTxt.setText(groupInfo.track.title);
             this.currentTrack = new MusicItem(
-                    -1, roomInfo.track.artist, roomInfo.track.title);
-            if (roomInfo.track.image != null) {
-                Uutils.setBitmapFromURL(this.coverImg, roomInfo.track.image);
+                    -1, groupInfo.track.artist, groupInfo.track.title);
+            if (groupInfo.track.image != null) {
+                Uutils.setBitmapFromURL(this.coverImg, groupInfo.track.image);
             } else {
                 this.coverImg.setImageResource(R.drawable.cover);
             }
@@ -269,7 +269,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
 
         // Notify the server.
         UnisonAPI api = AppData.getInstance(this.activity).getAPI();
-        api.setCurrentTrack(this.activity.getRoomId(), item.artist, item.title,
+        api.setCurrentTrack(this.activity.getGroupId(), item.artist, item.title,
                 new UnisonAPI.Handler<JsonStruct.Success>() {
 
             public void callback(JsonStruct.Success struct) {
@@ -285,7 +285,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
 
     private void notifySkip() {
         UnisonAPI api = AppData.getInstance(this.activity).getAPI();
-        api.skipTrack(this.activity.getRoomId(), new UnisonAPI.Handler<JsonStruct.Success>() {
+        api.skipTrack(this.activity.getGroupId(), new UnisonAPI.Handler<JsonStruct.Success>() {
             public void callback(JsonStruct.Success struct) {}
             public void onError(Error error) {
                 Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
@@ -294,18 +294,18 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     }
 
     private void setDJ(boolean isDJ) {
-        final long rid = ((MainActivity) this.getActivity()).getRoomId();
+        final long gid = ((MainActivity) this.getActivity()).getGroupId();
         AppData data = AppData.getInstance(getActivity());
 
         if (isDJ) {
-            data.getAPI().becomeMaster(rid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+            data.getAPI().becomeMaster(gid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success structure) {
                     djBtn.setText("Leave DJ seat");
                     toggleBtn.setBackgroundResource(R.drawable.btn_play);
                     buttons.setVisibility(View.VISIBLE);
 
-                    trackQueue = new TrackQueue(getActivity(), rid).start();
+                    trackQueue = new TrackQueue(getActivity(), gid).start();
                 }
 
                 public void onError(Error error) {
@@ -318,7 +318,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             if (this.trackQueue != null) {
                 this.trackQueue.stop();
             }
-            data.getAPI().resignMaster(rid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+            data.getAPI().resignMaster(gid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success structure) {
                     djBtn.setText("Become the DJ");
@@ -362,7 +362,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                         UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
                         Log.d(TAG, String.format("artist: %s, title: %s, rating: %d",
                                 currentTrack.artist, currentTrack.title, newRating));
-                        api.instantRate(activity.getRoomId(), currentTrack.artist, currentTrack.title,
+                        api.instantRate(activity.getGroupId(), currentTrack.artist, currentTrack.title,
                                 newRating, new UnisonAPI.Handler<JsonStruct.Success>(){
                             public void callback(JsonStruct.Success struct) {}
                             public void onError(Error error) {

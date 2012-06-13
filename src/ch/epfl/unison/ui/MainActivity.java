@@ -57,12 +57,12 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         }
     };
 
-    private Set<OnRoomInfoListener> listeners = new HashSet<OnRoomInfoListener>();
+    private Set<OnGroupInfoListener> listeners = new HashSet<OnGroupInfoListener>();
 
-    private long roomId;
+    private long groupId;
 
-    public long getRoomId() {
-        return this.roomId;
+    public long getGroupId() {
+        return this.groupId;
     }
 
     @Override
@@ -91,13 +91,13 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     }
 
     private void handleExtras(Bundle extras) {
-        if (extras == null || !extras.containsKey("rid")) {
-            // Should never happen. If it does, redirect the user to the rooms list.
-            this.startActivity(new Intent(this, RoomsActivity.class));
+        if (extras == null || !extras.containsKey("gid")) {
+            // Should never happen. If it does, redirect the user to the groups list.
+            this.startActivity(new Intent(this, GroupsActivity.class));
             this.finish();
         } else {
-            this.roomId = extras.getLong("rid");
-            Log.i(TAG, "joined room " + this.roomId);
+            this.groupId = extras.getLong("gid");
+            Log.i(TAG, "joined group " + this.groupId);
             if (extras.containsKey("name")) {
                 this.setTitle(extras.getString("name"));
             }
@@ -144,11 +144,11 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     public void onRefresh() {
         this.repaintRefresh(true);
         UnisonAPI api = AppData.getInstance(this).getAPI();
-        api.getRoomInfo(this.roomId, new UnisonAPI.Handler<JsonStruct.Room>() {
+        api.getGroupInfo(this.groupId, new UnisonAPI.Handler<JsonStruct.Group>() {
 
-            public void callback(JsonStruct.Room struct) {
-                MainActivity.this.onRoomInfo(struct);
-                MainActivity.this.dispatchRoomInfo(struct);
+            public void callback(JsonStruct.Group struct) {
+                MainActivity.this.onGroupInfo(struct);
+                MainActivity.this.dispatchGroupInfo(struct);
                 MainActivity.this.repaintRefresh(false);
             }
 
@@ -160,8 +160,8 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         });
     }
 
-    private void onRoomInfo(JsonStruct.Room room) {
-        this.setTitle(room.name);
+    private void onGroupInfo(JsonStruct.Group group) {
+        this.setTitle(group.name);
     }
 
     @Override
@@ -175,22 +175,22 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         return UnisonMenu.onOptionsItemSelected(this, this, item);
     }
 
-    public void dispatchRoomInfo(JsonStruct.Room roomInfo) {
-        for (OnRoomInfoListener listener : this.listeners) {
-            listener.onRoomInfo(roomInfo);
+    public void dispatchGroupInfo(JsonStruct.Group groupInfo) {
+        for (OnGroupInfoListener listener : this.listeners) {
+            listener.onGroupInfo(groupInfo);
         }
     }
 
-    public void registerRoomInfoListener(OnRoomInfoListener listener) {
+    public void registerGroupInfoListener(OnGroupInfoListener listener) {
         this.listeners.add(listener);
     }
 
-    public void unregisterRoomInfoListener(OnRoomInfoListener listener) {
+    public void unregisterGroupInfoListener(OnGroupInfoListener listener) {
         this.listeners.remove(listener);
     }
 
-    public static interface OnRoomInfoListener {
-        public void onRoomInfo(JsonStruct.Room roomInfo);
+    public static interface OnGroupInfoListener {
+        public void onGroupInfo(JsonStruct.Group groupInfo);
     }
 
 

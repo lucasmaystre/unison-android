@@ -48,7 +48,7 @@ public class SignupActivity extends SherlockActivity {
         if (item.getItemId() == android.R.id.home) {
             // app icon in Action Bar clicked; go home
             startActivity(new Intent(this, LoginActivity.class)
-                    .setAction(RoomsActivity.ACTION_LEAVE_ROOM)
+                    .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }
         return true;

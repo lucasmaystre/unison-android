@@ -36,9 +36,9 @@ public class TrackQueue {
     private Handler handler;
 
     private Context context;
-    private long roomId;
+    private long groupId;
 
-    public TrackQueue(Context context, long rid) {
+    public TrackQueue(Context context, long gid) {
         // LinkedHashSet returns insert-order iterators.
         this.playlist = Collections.synchronizedSet(
                 new LinkedHashSet<MusicItem>());
@@ -46,7 +46,7 @@ public class TrackQueue {
         this.isActive = false;
         this.handler = new Handler();
         this.context = context;
-        this.roomId = rid;
+        this.groupId = gid;
     }
 
     /** Populate the track queue, and start polling for changes. */
@@ -117,7 +117,7 @@ public class TrackQueue {
 
         UnisonAPI api = AppData.getInstance(this.context).getAPI();
         this.isPending = true;
-        api.getNextTracks(this.roomId, new UnisonAPI.Handler<JsonStruct.TracksList>() {
+        api.getNextTracks(this.groupId, new UnisonAPI.Handler<JsonStruct.TracksList>() {
 
             public void callback(JsonStruct.TracksList chunk) {
                 isPending = false;
@@ -152,7 +152,7 @@ public class TrackQueue {
             if (!isActive) { return; }
 
             UnisonAPI api = AppData.getInstance(context).getAPI();
-            api.getPlaylistId(roomId, new UnisonAPI.Handler<JsonStruct.TracksList>() {
+            api.getPlaylistId(groupId, new UnisonAPI.Handler<JsonStruct.TracksList>() {
 
                 public void callback(TracksList struct) {
                     if (struct.playlistId != null

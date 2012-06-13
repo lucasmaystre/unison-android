@@ -53,8 +53,8 @@ public abstract class UnisonMenu {
         break;
         case android.R.id.home:
             // app icon in Action Bar clicked; go home
-            activity.startActivity(new Intent(activity, RoomsActivity.class)
-                    .setAction(RoomsActivity.ACTION_LEAVE_ROOM)
+            activity.startActivity(new Intent(activity, GroupsActivity.class)
+                    .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         break;
         default:

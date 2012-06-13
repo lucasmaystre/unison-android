@@ -4,9 +4,9 @@
 
     <!-- Activity titles. -->
     <string name="activity_title_ratings">Ratings</string>
-    <string name="activity_title_rooms">Rooms</string>
+    <string name="activity_title_groups">Groups</string>
     <string name="activity_title_prefs">Settings</string>
-    <string name="activity_title_main">Room</string>
+    <string name="activity_title_main">Group</string>
     <string name="activity_title_help">Help</string>
     <string name="activity_title_signup">Sign Up</string>
 

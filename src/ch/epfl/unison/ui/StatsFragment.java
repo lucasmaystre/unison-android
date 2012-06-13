@@ -15,7 +15,7 @@ import ch.epfl.unison.api.JsonStruct;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-public class StatsFragment extends SherlockFragment implements MainActivity.OnRoomInfoListener {
+public class StatsFragment extends SherlockFragment implements MainActivity.OnGroupInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
@@ -36,32 +36,32 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnRo
         return v;
     }
 
-    public void onRoomInfo(JsonStruct.Room roomInfo) {
-        if (roomInfo.track != null && roomInfo.track.title != null) {
-            this.trackTitle.setText(roomInfo.track.title);
+    public void onGroupInfo(JsonStruct.Group groupInfo) {
+        if (groupInfo.track != null && groupInfo.track.title != null) {
+            this.trackTitle.setText(groupInfo.track.title);
         }
-        this.usersList.setAdapter(new StatsAdapter(roomInfo));
+        this.usersList.setAdapter(new StatsAdapter(groupInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = (MainActivity) activity;
-        this.activity.registerRoomInfoListener(this);
+        this.activity.registerGroupInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        this.activity.unregisterRoomInfoListener(this);
+        this.activity.unregisterGroupInfoListener(this);
     }
 
     private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
 
         public static final int ROW_LAYOUT = R.layout.stats_row;
 
-        public StatsAdapter(JsonStruct.Room room) {
-            super(StatsFragment.this.getActivity(), 0, room.users);
+        public StatsAdapter(JsonStruct.Group group) {
+            super(StatsFragment.this.getActivity(), 0, group.users);
         }
 
         @Override

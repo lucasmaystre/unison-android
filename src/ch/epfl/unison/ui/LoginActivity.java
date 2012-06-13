@@ -130,13 +130,13 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void nextActivity(JsonStruct.User user) {
-        if (user.rid != null) {
-            // Directly go into room.
+        if (user.gid != null) {
+            // Directly go into group.
             this.startActivity(new Intent(this, MainActivity.class)
-                    .putExtra("rid", user.rid));
+                    .putExtra("gid", user.gid));
         } else {
-            // Display list of rooms.
-            this.startActivity(new Intent(this, RoomsActivity.class));
+            // Display list of groups.
+            this.startActivity(new Intent(this, GroupsActivity.class));
         }
         // Close this activity.
         this.finish();

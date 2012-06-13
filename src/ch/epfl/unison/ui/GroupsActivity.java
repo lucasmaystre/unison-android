@@ -27,7 +27,7 @@ import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.JsonStruct.RoomsList;
+import ch.epfl.unison.api.JsonStruct.GroupsList;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
@@ -36,15 +36,15 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
+public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
-    private static final String TAG = "ch.epfl.unison.RoomsActivity";
+    private static final String TAG = "ch.epfl.unison.GroupsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
-    public static final String ACTION_LEAVE_ROOM = "ch.epfl.unison.action.LEAVE_ROOM";
+    public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
 
-    private ListView roomsList;
+    private ListView groupsList;
     private Menu menu;
 
     private boolean isForeground = false;
@@ -73,19 +73,18 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         this.registerReceiver(this.logoutReceiver,
                 new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-        this.setContentView(R.layout.rooms);
-        //this.setTitle(R.string.activity_title_rooms);
+        this.setContentView(R.layout.groups);
 
-        ((Button)this.findViewById(R.id.createRoomBtn))
-                .setOnClickListener(new OnCreateRoomListener());
+        ((Button)this.findViewById(R.id.createGroupBtn))
+                .setOnClickListener(new OnCreateGroupListener());
 
-        this.roomsList = (ListView)this.findViewById(R.id.roomsList);
-        this.roomsList.setOnItemClickListener(new OnRoomSelectedListener());
+        this.groupsList = (ListView)this.findViewById(R.id.groupsList);
+        this.groupsList.setOnItemClickListener(new OnGroupSelectedListener());
 
         // Actions that should be taken whe activity is started.
-        if (ACTION_LEAVE_ROOM.equals(this.getIntent().getAction())) {
-            // We are coming back from a room - let's make sure the back-end knows.
-            this.leaveRoom();
+        if (ACTION_LEAVE_GROUP.equals(this.getIntent().getAction())) {
+            // We are coming back from a group - let's make sure the back-end knows.
+            this.leaveGroup();
         } else if (AppData.getInstance(this).showHelpDialog()) {
             this.showHelpDialog();
         }
@@ -125,17 +124,17 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
     public void onRefresh() {
         this.repaintRefresh(true);
 
-        UnisonAPI.Handler<JsonStruct.RoomsList> handler
-                = new UnisonAPI.Handler<JsonStruct.RoomsList>() {
+        UnisonAPI.Handler<JsonStruct.GroupsList> handler
+                = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
 
-            public void callback(RoomsList struct) {
-                RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
-                RoomsActivity.this.repaintRefresh(false);
+            public void callback(GroupsList struct) {
+                GroupsActivity.this.groupsList.setAdapter(new GroupsAdapter(struct));
+                GroupsActivity.this.repaintRefresh(false);
             }
 
             public void onError(UnisonAPI.Error error) {
-                Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-                RoomsActivity.this.repaintRefresh(false);
+                Toast.makeText(GroupsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                GroupsActivity.this.repaintRefresh(false);
             }
         };
 
@@ -143,9 +142,9 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         if (data.getLocation() != null) {
             double lat = data.getLocation().getLatitude();
             double lon = data.getLocation().getLongitude();
-            data.getAPI().listRooms(lat, lon, handler);
+            data.getAPI().listGroups(lat, lon, handler);
         } else {
-            data.getAPI().listRooms(handler);
+            data.getAPI().listGroups(handler);
         }
     }
 
@@ -170,17 +169,17 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         }
     }
 
-    private void leaveRoom() {
-        // Make sure the user is not marked as present in any room.
+    private void leaveGroup() {
+        // Make sure the user is not marked as present in any group.
         AppData data = AppData.getInstance(this);
-        data.getAPI().leaveRoom(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+        data.getAPI().leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
             public void callback(Success struct) {
-                Log.d(TAG, "successfully left room");
+                Log.d(TAG, "successfully left group");
             }
 
             public void onError(Error error) {
-                Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(GroupsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -200,10 +199,10 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
             public void onClick(DialogInterface dialog, int which) {
                 if (cbox.isChecked()) {
                     // Don't show the dialog again in the future.
-                    AppData.getInstance(RoomsActivity.this).setShowHelpDialog(false);
+                    AppData.getInstance(GroupsActivity.this).setShowHelpDialog(false);
                 }
                 if (DialogInterface.BUTTON_POSITIVE == which) {
-                    startActivity(new Intent(RoomsActivity.this, HelpActivity.class));
+                    startActivity(new Intent(GroupsActivity.this, HelpActivity.class));
                 }
             }
         };
@@ -213,47 +212,47 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         alert.show();
     }
 
-    private class RoomsAdapter extends ArrayAdapter<JsonStruct.Room> {
+    private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
 
-        public static final int ROW_LAYOUT = R.layout.rooms_row;
+        public static final int ROW_LAYOUT = R.layout.groups_row;
 
-        public RoomsAdapter(JsonStruct.RoomsList list) {
-            super(RoomsActivity.this, 0, list.rooms);
+        public GroupsAdapter(JsonStruct.GroupsList list) {
+            super(GroupsActivity.this, 0, list.groups);
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            JsonStruct.Room room = this.getItem(position);
+            JsonStruct.Group group = this.getItem(position);
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) RoomsActivity.this.getSystemService(
+                LayoutInflater inflater = (LayoutInflater) GroupsActivity.this.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.roomName)).setText(room.name);
+            ((TextView) view.findViewById(R.id.groupName)).setText(group.name);
             String subtitle = null;
-            if (room.distance != null) {
+            if (group.distance != null) {
                 subtitle = String.format("%s away - %d people.",
-                        Uutils.distToString(room.distance), room.nbUsers);
+                        Uutils.distToString(group.distance), group.nbUsers);
             } else {
-                subtitle = String.format("%d people.", room.nbUsers);
+                subtitle = String.format("%d people.", group.nbUsers);
             }
             ((TextView) view.findViewById(R.id.nbParticipants)).setText(subtitle);
 
-            view.setTag(room);
+            view.setTag(group);
             return view;
         }
     }
 
-    private class OnCreateRoomListener implements OnClickListener {
+    private class OnCreateGroupListener implements OnClickListener {
 
         public void onClick(View v) {
-            AlertDialog.Builder alert = new AlertDialog.Builder(RoomsActivity.this);
+            AlertDialog.Builder alert = new AlertDialog.Builder(GroupsActivity.this);
 
-            alert.setTitle("New Room");
-            alert.setMessage("Pick a name for the room:");
+            alert.setTitle("New Group");
+            alert.setMessage("Pick a name for the group:");
 
             // Set an EditText view to get user input
-            final EditText input = new EditText(RoomsActivity.this);
+            final EditText input = new EditText(GroupsActivity.this);
             alert.setView(input);
 
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -261,18 +260,18 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String name = input.getText().toString();
 
-                    AppData data = AppData.getInstance(RoomsActivity.this);
+                    AppData data = AppData.getInstance(GroupsActivity.this);
                     double lat = data.getLocation().getLatitude();
                     double lon = data.getLocation().getLongitude();
-                    data.getAPI().createRoom(name, lat, lon,
-                            new UnisonAPI.Handler<JsonStruct.RoomsList>() {
+                    data.getAPI().createGroup(name, lat, lon,
+                            new UnisonAPI.Handler<JsonStruct.GroupsList>() {
 
-                        public void callback(RoomsList struct) {
-                            RoomsActivity.this.roomsList.setAdapter(new RoomsAdapter(struct));
+                        public void callback(GroupsList struct) {
+                            GroupsActivity.this.groupsList.setAdapter(new GroupsAdapter(struct));
                         }
 
                         public void onError(Error error) {
-                            Toast.makeText(RoomsActivity.this, error.toString(),
+                            Toast.makeText(GroupsActivity.this, error.toString(),
                                     Toast.LENGTH_LONG).show();
                         }
                     });
@@ -284,22 +283,22 @@ public class RoomsActivity extends SherlockActivity implements UnisonMenu.OnRefr
         }
     }
 
-    private class OnRoomSelectedListener implements OnItemClickListener {
+    private class OnGroupSelectedListener implements OnItemClickListener {
 
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
-            UnisonAPI api = AppData.getInstance(RoomsActivity.this).getAPI();
-            long uid = AppData.getInstance(RoomsActivity.this).getUid();
-            final JsonStruct.Room room = (JsonStruct.Room) view.getTag();
+            UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
+            long uid = AppData.getInstance(GroupsActivity.this).getUid();
+            final JsonStruct.Group group = (JsonStruct.Group) view.getTag();
 
-            api.joinRoom(uid, room.rid, new UnisonAPI.Handler<JsonStruct.Success>() {
+            api.joinGroup(uid, group.gid, new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success struct) {
-                    RoomsActivity.this.startActivity(new Intent(RoomsActivity.this, MainActivity.class)
-                            .putExtra("rid", room.rid).putExtra("name", room.name));
+                    GroupsActivity.this.startActivity(new Intent(GroupsActivity.this, MainActivity.class)
+                            .putExtra("gid", group.gid).putExtra("name", group.name));
                 }
 
                 public void onError(Error error) {
-                    Toast.makeText(RoomsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(GroupsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 }
 
             });

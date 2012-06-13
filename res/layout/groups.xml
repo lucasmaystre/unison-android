@@ -11,12 +11,12 @@
       android:background="#3FFF">
 
     <Button
-        android:id="@+id/createRoomBtn"
+        android:id="@+id/createGroupBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginRight="10dp"
-        android:text="Create a room" />
+        android:text="Create a group" />
 
     <TextView
         android:layout_width="0dp"
@@ -31,6 +31,6 @@
       android:layout_height="0dp"
       android:layout_width="match_parent"
       android:layout_weight="1"
-      android:id="@+id/roomsList" />
+      android:id="@+id/groupsList" />
 
 </LinearLayout>
