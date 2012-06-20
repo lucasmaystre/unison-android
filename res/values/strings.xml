@@ -28,5 +28,18 @@
     <string name="rating_true">explicit user rating</string>
     <string name="rating_unknown">not yet computed</string>
 
-    <!-- Layouts. -->
+    <!-- Errors. -->
+    <string name="error_loading_groups">Unable to load the list of groups.</string>
+    <string name="error_joining_group">Unable to join the group.</string>
+    <string name="error_creating_group">Unable to create the group.</string>
+    <string name="error_unauthorized">Incorrect password or e-mail address.</string>
+    <string name="error_login_general">Unable to log in. Are you connected ?</string>
+    <string name="error_loading_info">Unable to load the information.</string>
+    <string name="error_updating_nick">Unable to update nickname.</string>
+    <string name="error_loading_ratings">Unable to load the ratings.</string>
+    <string name="error_updating_rating">Unable to update rating.</string>
+    <string name="error_getting_track">Unable to load next track.</string>
+    <string name="error_sending_track">Unable to send play notification to the server.</string>
+    <string name="error_sending_rating">Unable to save rating.</string>
+    <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
 </resources>

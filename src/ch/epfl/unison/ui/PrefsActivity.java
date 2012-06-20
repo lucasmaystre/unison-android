@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.util.Log;
+import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -64,6 +65,11 @@ public class PrefsActivity extends SherlockPreferenceActivity {
 
                 public void onError(Error error) {
                     Log.w(TAG, String.format("couldn't set new nickname %s", newNick));
+                    Log.d(TAG, error.toString());
+                    if (PrefsActivity.this != null) {
+                        Toast.makeText(PrefsActivity.this, R.string.error_updating_nick,
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
             });
             return true;

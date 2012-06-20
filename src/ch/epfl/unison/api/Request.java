@@ -13,11 +13,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import android.util.Log;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Request<T extends JsonStruct> {
+
+    private static final String TAG = "ch.epfl.unison.Request";
 
     static {
         // Close HTTP connections at end of request. Fixes some bugs in early
@@ -83,6 +87,7 @@ public class Request<T extends JsonStruct> {
     }
 
     private Result<T> execute(String method) {
+        Log.i(TAG, String.format("%s request to %s", method, this.url.toString()));
         HttpURLConnection conn = null;
         String response = null;
 
@@ -133,6 +138,7 @@ public class Request<T extends JsonStruct> {
             // - IOException, thrown by most HttpURLConnection methods,
             // - NullPointerException. if there's not InputStream nor ErrorStream,
             // - JsonSyntaxException, if we fail to decode the server's response.
+            Log.w(TAG, "caught exception while handling request", e);
             int statusCode = 0;
             String statusMessage = null;
             try {

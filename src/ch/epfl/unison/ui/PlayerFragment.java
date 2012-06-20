@@ -152,6 +152,9 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         if (this.isBound) {
             this.activity.unbindService(this.connection);
         }
+        if (this.trackQueue != null) {
+            this.trackQueue.stop();
+        }
     }
 
     @Override
@@ -235,7 +238,10 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                 }
 
                 public void onError() {
-                    Toast.makeText(getActivity(), "Error when getting track", Toast.LENGTH_LONG).show();
+                    Context c = getActivity();
+                    if (c != null) {
+                        Toast.makeText(c, R.string.error_getting_track, Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }
@@ -278,7 +284,11 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             }
 
             public void onError(Error error) {
-                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, error.toString());
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), R.string.error_sending_track,
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -288,7 +298,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         api.skipTrack(this.activity.getGroupId(), new UnisonAPI.Handler<JsonStruct.Success>() {
             public void callback(JsonStruct.Success struct) {}
             public void onError(Error error) {
-                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, error.toString());
             }
         });
     }
@@ -309,7 +319,11 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                 }
 
                 public void onError(Error error) {
-                    Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    Log.d(TAG, error.toString());
+                    if (getActivity() != null) {
+                        Toast.makeText(getActivity(), R.string.error_becoming_dj,
+                                Toast.LENGTH_LONG).show();
+                    }
                     PlayerFragment.this.setDJ(false);
                 }
             });
@@ -329,7 +343,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                 }
 
                 public void onError(Error error) {
-                    Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    Log.d(TAG, error.toString());
                 }
             });
         }
@@ -366,8 +380,11 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                                 newRating, new UnisonAPI.Handler<JsonStruct.Success>(){
                             public void callback(JsonStruct.Success struct) {}
                             public void onError(Error error) {
-                                Toast.makeText(getActivity(), error.toString(),
-                                        Toast.LENGTH_LONG).show();
+                                Log.d(TAG, error.toString());
+                                if (getActivity() != null) {
+                                    Toast.makeText(getActivity(), R.string.error_sending_rating,
+                                            Toast.LENGTH_LONG).show();
+                                }
                             }
                         });
                     }

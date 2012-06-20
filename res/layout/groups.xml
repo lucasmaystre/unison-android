@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginRight="10dp"
-        android:text="Create a group" />
+        android:text="Create group" />
 
     <TextView
         android:layout_width="0dp"

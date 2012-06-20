@@ -154,7 +154,14 @@ public class LoginActivity extends SherlockActivity {
             }
 
             public void onError(Error error) {
-                Toast.makeText(LoginActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, error.toString());
+                if (error.statusCode == 403) {
+                    Toast.makeText(LoginActivity.this, R.string.error_unauthorized,
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, R.string.error_login_general,
+                            Toast.LENGTH_LONG).show();
+                }
                 dialog.dismiss();
             }
         });

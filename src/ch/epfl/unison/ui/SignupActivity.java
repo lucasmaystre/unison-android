@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -81,6 +82,7 @@ public class SignupActivity extends SherlockActivity {
     }
 
     public void handleError(UnisonAPI.Error error) {
+        Log.d(TAG, error.toString());
         if (error.hasJsonError()) {
             if (UnisonAPI.ErrorCodes.MISSING_FIELD == error.jsonError.error) {
                 this.showError("Fields are missing.");

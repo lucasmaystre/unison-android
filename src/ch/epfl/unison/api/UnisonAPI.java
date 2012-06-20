@@ -204,7 +204,7 @@ public class UnisonAPI {
 
     public static interface Handler<S> {
         public void callback(S struct);
-        public void onError(UnisonAPI.Error error);
+        public void onError(Error error);
     }
 
     public static class Error {

@@ -23,37 +23,38 @@ public class AppData implements OnSharedPreferenceChangeListener {
     private SharedPreferences prefs;
 
     private LocationManager locationMgr;
-    private String locationProvider;
-    private UnisonLocationListener locationListener;
-    private Location location;
+    private UnisonLocationListener gpsListener;
+    private Location gpsLocation;
+    private UnisonLocationListener networkListener;
+    private Location networkLocation;
 
     private AppData(Context context) {
         this.context = context;
-        this.locationListener = new UnisonLocationListener();
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
         this.prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     private AppData setupLocation() {
-        boolean updateListener = false;
         if (this.locationMgr == null) {
             this.locationMgr = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            this.locationProvider = LocationManager.NETWORK_PROVIDER;
-            updateListener = true;
         }
-        if (!this.locationProvider.equals(LocationManager.GPS_PROVIDER)
+        // try to set up the network location listener.
+        if (this.networkListener == null
+                && this.locationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            this.networkListener = new UnisonLocationListener(LocationManager.NETWORK_PROVIDER);
+            this.locationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    LOCATION_INTERVAL, 1f, this.networkListener);
+            this.networkLocation = this.locationMgr.getLastKnownLocation(
+                    LocationManager.NETWORK_PROVIDER);
+        }
+        // try to set up the GPS location listener.
+        if (this.gpsListener == null
                 && this.locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            // Always try to upgrade to GPS.
-            this.locationProvider = LocationManager.GPS_PROVIDER;
-            updateListener = true;
-        }
-        if (this.location == null) {
-            this.location = this.locationMgr.getLastKnownLocation(this.locationProvider);
-        }
-        if (updateListener) {
-            this.locationMgr.removeUpdates(this.locationListener);
-            this.locationMgr.requestLocationUpdates(
-                    this.locationProvider, LOCATION_INTERVAL, 1f, this.locationListener);
+            this.gpsListener = new UnisonLocationListener(LocationManager.GPS_PROVIDER);
+            this.locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_INTERVAL, 1f, this.gpsListener);
+            this.gpsLocation = this.locationMgr.getLastKnownLocation(
+                    LocationManager.GPS_PROVIDER);
         }
         return this;
     }
@@ -84,7 +85,8 @@ public class AppData implements OnSharedPreferenceChangeListener {
     }
 
     public Location getLocation() {
-        return this.location;
+        // Prefer GPS locations over network locations.
+        return this.gpsLocation != null ? this.gpsLocation : this.networkLocation;
     }
 
     public static synchronized AppData getInstance(Context c) {
@@ -103,10 +105,22 @@ public class AppData implements OnSharedPreferenceChangeListener {
 
     public class UnisonLocationListener implements LocationListener {
 
+        private String provider;
+
+        public UnisonLocationListener(String provider) {
+            this.provider = provider;
+        }
+
         public void onLocationChanged(Location location) {
-            AppData.this.location = location;
-            Log.i(TAG, String.format("Got location: lat=%f, lon=%f",
-                    location.getLatitude(), location.getLongitude()));
+            if (LocationManager.GPS_PROVIDER.equals(this.provider)) {
+                AppData.this.gpsLocation = location;
+            } else if (LocationManager.NETWORK_PROVIDER.equals(this.provider)) {
+                AppData.this.networkLocation = location;
+            } else {
+                throw new RuntimeException("unsupported location provider");
+            };
+            Log.i(TAG, String.format("Got location (%s): lat=%f, lon=%f",
+                    provider, location.getLatitude(), location.getLongitude()));
         }
 
         public void onProviderDisabled(String provider) {}

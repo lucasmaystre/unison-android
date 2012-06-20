@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -153,8 +154,12 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             }
 
             public void onError(UnisonAPI.Error error) {
-                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-                MainActivity.this.repaintRefresh(false);
+                Log.d(TAG, error.toString());
+                if (MainActivity.this != null) {
+                    Toast.makeText(MainActivity.this, R.string.error_loading_info,
+                            Toast.LENGTH_LONG).show();
+                    MainActivity.this.repaintRefresh(false);
+                }
             }
 
         });
@@ -173,6 +178,18 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return UnisonMenu.onOptionsItemSelected(this, this, item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            this.startActivity(new Intent(this, GroupsActivity.class)
+                    .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            this.finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     public void dispatchGroupInfo(JsonStruct.Group groupInfo) {

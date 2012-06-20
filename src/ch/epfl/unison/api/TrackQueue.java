@@ -129,6 +129,8 @@ public class TrackQueue {
                         playlist.clear();
                     }
                     for (JsonStruct.Track track : chunk.tracks) {
+                        Log.d(TAG, String.format("Adding %s - %s to the queue",
+                                track.artist, track.title));
                         playlist.add(new MusicItem(track.localId, track.artist, track.title));
                     }
                 }
@@ -151,12 +153,15 @@ public class TrackQueue {
         public void run() {
             if (!isActive) { return; }
 
+            Log.d(TAG, "Polling for a new playlist...");
             UnisonAPI api = AppData.getInstance(context).getAPI();
             api.getPlaylistId(groupId, new UnisonAPI.Handler<JsonStruct.TracksList>() {
 
                 public void callback(TracksList struct) {
                     if (struct.playlistId != null
                             && !struct.playlistId.equals(playlistId)) {
+                        Log.d(TAG, String.format("Playlist ID changed from %s to %s",
+                                playlistId, struct.playlistId));
                         requestTracks();
                     }
                     handler.postDelayed(Poller.this, POLL_INTERVAL);

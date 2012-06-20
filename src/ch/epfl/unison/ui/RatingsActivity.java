@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +106,11 @@ public class RatingsActivity extends SherlockActivity {
             }
 
             public void onError(Error error) {
-                Toast.makeText(RatingsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, error.toString());
+                if (RatingsActivity.this != null) {
+                    Toast.makeText(RatingsActivity.this, R.string.error_loading_ratings,
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -202,7 +207,11 @@ public class RatingsActivity extends SherlockActivity {
                             }
 
                             public void onError(Error error) {
-                                Toast.makeText(RatingsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                                Log.d(TAG, error.toString());
+                                if (RatingsActivity.this != null) {
+                                    Toast.makeText(RatingsActivity.this, R.string.error_updating_rating,
+                                            Toast.LENGTH_LONG).show();
+                                }
                             }
                         });
                     }

@@ -42,6 +42,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
+    // EPFL Polydome.
+    private static final double DEFAULT_LATITUDE = 46.52147800207456;
+    private static final double DEFAULT_LONGITUDE = 6.568992733955383;
+
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
 
     private ListView groupsList;
@@ -133,8 +137,12 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             }
 
             public void onError(UnisonAPI.Error error) {
-                Toast.makeText(GroupsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-                GroupsActivity.this.repaintRefresh(false);
+                Log.d(TAG, error.toString());
+                if (GroupsActivity.this != null) {
+                    Toast.makeText(GroupsActivity.this, R.string.error_loading_groups,
+                            Toast.LENGTH_LONG).show();
+                    GroupsActivity.this.repaintRefresh(false);
+                }
             }
         };
 
@@ -179,7 +187,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             }
 
             public void onError(Error error) {
-                Toast.makeText(GroupsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, error.toString());
             }
         });
     }
@@ -259,10 +267,17 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String name = input.getText().toString();
-
                     AppData data = AppData.getInstance(GroupsActivity.this);
-                    double lat = data.getLocation().getLatitude();
-                    double lon = data.getLocation().getLongitude();
+
+                    double lat, lon;
+                    if (data.getLocation() != null) {
+                        lat = data.getLocation().getLatitude();
+                        lon = data.getLocation().getLongitude();
+                    } else {
+                        lat = DEFAULT_LATITUDE;
+                        lon = DEFAULT_LONGITUDE;
+                        Log.i(TAG, "location was null, using default values");
+                    }
                     data.getAPI().createGroup(name, lat, lon,
                             new UnisonAPI.Handler<JsonStruct.GroupsList>() {
 
@@ -271,8 +286,11 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                         }
 
                         public void onError(Error error) {
-                            Toast.makeText(GroupsActivity.this, error.toString(),
-                                    Toast.LENGTH_LONG).show();
+                            Log.d(TAG, error.toString());
+                            if (GroupsActivity.this != null) {
+                                Toast.makeText(GroupsActivity.this, R.string.error_creating_group,
+                                        Toast.LENGTH_LONG).show();
+                            }
                         }
                     });
                 }
@@ -298,7 +316,11 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 }
 
                 public void onError(Error error) {
-                    Toast.makeText(GroupsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                    Log.d(TAG, error.toString());
+                    if (GroupsActivity.this != null) {
+                        Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
 
             });
